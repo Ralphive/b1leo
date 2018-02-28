@@ -6,6 +6,13 @@ var bodyParser = require('body-parser');
 var app = express();
 app.use(express.static('public'));
 
+console.log("Allowing CORS...")
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 /* Load Local Modules */
 var sl = require('./modules/serviceLayer');
 var leo = require('./modules/leo');
@@ -14,13 +21,11 @@ var biz = require('./modules/biz');
 var slSession = null;
 var output = {};
 
-
 //First Thing, connect to SL and store a SessionID
 sl.Connect(function (error, resp) {
     if (error) {
         console.error("Can't Connect to Service Layer");
         console.error(error);
-        return; // Abort Execution
     } else {
         slSession = resp;
     }
@@ -49,12 +54,30 @@ app.get('/Items', function (req, res) {
     });
 });
 
-/** Receives a Text Message
- * Classify it with SAP Leonardo Business Services
+app.post('/Message', function (req, res) {
+    console.log("REQUEST: Classify Text with Leo: " + req.body.text)
+    leo.Classify(req.body.text, function (error, response, body) {
+        if (error) {
+            body = { error: error };
+            res.setHeader('Content-Type', 'application/json')
+            res.status(response.statusCode)
+            res.send(body)
+        } else {
+            //After classify the kind of request, create e B1 Activity
+            res.setHeader('Content-Type', 'application/json')
+            res.status(response.statusCode)
+            res.send(body)
+        }
+    });
+});
+
+
+/** Receives a Text and classifies it with SAP Leonardo Business Services
  * Ticket Intelligence Classification API
  * Then Creates an Activity in SAP Business One with the Result
+ * If set, it also sends an Internal B1 Message
  */
-app.post('/Message', function (req, res) {
+app.post('/MessageWithAction', function (req, res) {
     console.log("REQUEST: Classify Text with Leo: " + req.body.text)
     leo.Classify(req.body.text, function (error, response, body) {
         if (error) {
@@ -71,9 +94,8 @@ app.post('/Message', function (req, res) {
                 Priority: biz.MessagePriority(body.value),
                 Details: biz.MessageDetails(body.value) + CardCode
             }
-            
-            console.log("Posting Activity to B1")
-            sl.PostActivity(options, function(error, response, body){
+
+            sl.PostActivity(options, function (error, response, body) {
                 if (error) {
                     body = { error: error };
                     res.setHeader('Content-Type', 'application/json')
@@ -82,9 +104,24 @@ app.post('/Message', function (req, res) {
                 } else {
                     /* Depending of the priority of the Activity.
                     sends aso a message */
-                    res.setHeader('Content-Type', 'application/json')
-                    res.status(response.statusCode)
-                    res.send(body)
+                    if (biz.RequireMessage(body.Priority)) {
+                        options.body = biz.FormatMessage(body)
+                        sl.PostMessage(options, function (error, response, bodymess) {
+                            if (error) {
+                                body.Message = { error: error };
+                            } else {
+                                body.Message = bodymess;
+                            }
+                            res.setHeader('Content-Type', 'application/json')
+                            res.status(response.statusCode)
+                            res.send(body)
+
+                        })
+                    } else {
+                        res.setHeader('Content-Type', 'application/json')
+                        res.status(response.statusCode)
+                        res.send(body)
+                    }
                 }
             })
         }

@@ -7,18 +7,19 @@ module.exports = {
     PostActivity: function (options, callback) {
         return (PostActivity(options, callback));
     },
-    PostItems: function (options, body, callback) {
-        return (PostItems(options, body, callback));
+    PostMessage: function (options, body, callback) {
+        return (PostMessage(options, body, callback));
     }
 }
 
+//Load Node Modules
+var req = require('request') // HTTP Client
 
 //Load Local configuration file
 var SLServer =   process.env.B1_SERVER_ENV+":"
                 +process.env.B1_SLPORT_ENV 
                 +process.env.B1_SLPATH_ENV;
-//Load Node Modules
-var req = require('request') // HTTP Client
+
 
 function Connect(callback) {
     var uri = SLServer + "Login"
@@ -53,13 +54,10 @@ function Connect(callback) {
 
 }
 
-function PostActivity(options, callback) {
 
-    //Set HTTP Request Options
-    options.uri = SLServer + "Activities"
-    
-    options.body = JSON.stringify(options.body);
-    //Make Request
+function SLPost(options, endpoint, callback){
+    options.uri = SLServer + endpoint
+    console.log("Posting " +endpoint+ " to "+ options.uri)
     req.post(options, function (error, response, body) {
         if (!error && response.statusCode == 201) {
             body = JSON.parse(body);
@@ -70,28 +68,24 @@ function PostActivity(options, callback) {
         }
     });
 }
-function PostItems(options, body, callback) {
 
-    var uri = SLServer + "Items"
-    var resp = {}
 
-    //Set HTTP Request Options
-    options.uri = uri
-    body.ItemsGroupCode = ItemGroupCode
-    options.body = JSON.stringify(body);
+function PostActivity(options, callback) {
 
-    console.log("Posting Items to SL on " + uri);
-    console.log("Item body: \n" + JSON.stringify(body));
+    /* Additional Body logic */
 
+    options.body = JSON.stringify(options.body);
+    
     //Make Request
-    req.post(options, function (error, response, body) {
-        if (!error && response.statusCode == 201) {
-            body = JSON.parse(body);
-            console.log("ITEM CREATED - " + JSON.stringify(body))
-            return callback(null, body);
-        } else {
-            console.error("Can't Create SL ITEM" + error);
-            return callback(error);
-        }
-    });
+    SLPost(options, "Activities", callback)
+}
+
+function PostMessage(options, callback) {
+
+    /* Additional Body logic */
+
+    options.body = JSON.stringify(options.body);
+    
+    //Make Request
+    SLPost(options, "Messages", callback)
 }
