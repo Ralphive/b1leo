@@ -21,15 +21,8 @@ var biz = require('./modules/biz');
 var slSession = null;
 var output = {};
 
-//First Thing, connect to SL and store a SessionID
-sl.Connect(function (error, resp) {
-    if (error) {
-        console.error("Can't Connect to Service Layer");
-        console.error(error);
-    } else {
-        slSession = resp;
-    }
-});
+
+slConnect();
 
 //To Support body on post requests
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -67,6 +60,8 @@ app.post('/MessageWithAction', function (req, res) {
     console.log("REQUEST: Classify Text with Leo and perform Actions: " + req.body.text)
     leo.Classify(req.body.text, function (error, response, body) {
         if (error) {
+            if (response.statusCode == 401) //Invalid Session
+                slConnect();
             body = { error: error };
             res.setHeader('Content-Type', 'application/json')
             res.status(response.statusCode)
@@ -119,3 +114,15 @@ var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
+
+function slConnect() {
+    //Connect to SL and store a SessionID
+    sl.Connect(function (error, resp) {
+        if (error) {
+            console.error("Can't Connect to Service Layer");
+            console.error(error);
+        } else {
+            slSession = resp;
+        }
+    });
+}
