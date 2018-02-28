@@ -40,20 +40,6 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'views/index.html'));
 });
 
-//EndPoint To retrieve Items from Service Layer
-app.get('/Items', function (req, res) {
-    console.log("REQUEST: Retrive Service Layer Items");
-    var options = { headers: { 'Cookie': slSession.cookie } };
-    sl.GetItems(options, function (error, resp, body) {
-        if (error) {
-            body = { error: error };
-        }
-        res.setHeader('Content-Type', 'application/json')
-        res.status(resp.statusCode)
-        res.send(body)
-    });
-});
-
 app.post('/Message', function (req, res) {
     console.log("REQUEST: Classify Text with Leo: " + req.body.text)
     leo.Classify(req.body.text, function (error, response, body) {
