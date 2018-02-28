@@ -4,7 +4,7 @@
   "description": " B1 Integration with SAP Leonardo Ticketing API ",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node app.js",
     "start":"node app.js"
   },
   "repository": {
