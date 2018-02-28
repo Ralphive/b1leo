@@ -9,12 +9,13 @@ app.use(express.static('public'));
 /* Load Local Modules */
 var sl = require('./modules/serviceLayer');
 var leo = require('./modules/leo');
+var biz = require('./modules/biz');
 
 var slSession = null;
 var output = {};
 
 
-//First Thing, coonect to SL and store a SessionID
+//First Thing, connect to SL and store a SessionID
 sl.Connect(function (error, resp) {
     if (error) {
         console.error("Can't Connect to Service Layer");
@@ -55,19 +56,39 @@ app.get('/Items', function (req, res) {
  */
 app.post('/Message', function (req, res) {
     console.log("REQUEST: Classify Text with Leo: " + req.body.text)
-
     leo.Classify(req.body.text, function (error, response, body) {
         if (error) {
             body = { error: error };
+            res.setHeader('Content-Type', 'application/json')
+            res.status(response.statusCode)
+            res.send(body)
+        } else {
+            //After classify the kind of request, create e B1 Activity
+            var CardCode = req.body.customer || ""
+            var options = { headers: { 'Cookie': slSession.cookie } };
+            options.body = {
+                CardCode: CardCode,
+                Priority: biz.MessagePriority(body.value),
+                Details: biz.MessageDetails(body.value) + CardCode
+            }
+            
+            console.log("Posting Activity to B1")
+            sl.PostActivity(options, function(error, response, body){
+                if (error) {
+                    body = { error: error };
+                    res.setHeader('Content-Type', 'application/json')
+                    res.status(response.statusCode)
+                    res.send(body)
+                } else {
+                    /* Depending of the priority of the Activity.
+                    sends aso a message */
+                    res.setHeader('Content-Type', 'application/json')
+                    res.status(response.statusCode)
+                    res.send(body)
+                }
+            })
         }
-        res.setHeader('Content-Type', 'application/json')
-        res.status(response.statusCode)
-        res.send(body)
     });
-    console.error(e.message)
-    res.setHeader('Content-Type', 'application/json')
-    res.status(500)
-    res.send({ error: e.message })
 });
 
 var port = process.env.PORT || 30000

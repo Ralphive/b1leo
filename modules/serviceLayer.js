@@ -1,14 +1,14 @@
 /* Service Layer module to interact with B1 Data */
-/* Server Configuration and User Credentials set in the /config.json file */
+/* Server Configuration and User Credentials set in environment variables */
 module.exports = {
-    Connect: function (response) {
-        return (Connect(response));
+    Connect: function (callback) {
+        return (Connect(callback));
     },
-    GetItems: function (options, response) {
-        return (GetItems(options, response));
+    PostActivity: function (options, callback) {
+        return (PostActivity(options, callback));
     },
-    PostItems: function (options, body, response) {
-        return (PostItems(options, body, response));
+    PostItems: function (options, body, callback) {
+        return (PostItems(options, body, callback));
     }
 }
 
@@ -53,17 +53,15 @@ function Connect(callback) {
 
 }
 
-function GetItems(options, callback) {
-    var uri = SLServer + "Items"
+function PostActivity(options, callback) {
 
     //Set HTTP Request Options
-    options.uri = uri
-
-    console.log("Getting Items From SL on " + uri);
-
+    options.uri = SLServer + "Activities"
+    
+    options.body = JSON.stringify(options.body);
     //Make Request
-    req.get(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+    req.post(options, function (error, response, body) {
+        if (!error && response.statusCode == 201) {
             body = JSON.parse(body);
             delete body["odata.metadata"];
             return callback(null,response, body);
