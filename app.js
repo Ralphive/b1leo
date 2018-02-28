@@ -78,7 +78,8 @@ app.post('/MessageWithAction', function (req, res) {
             options.body = {
                 CardCode: CardCode,
                 Priority: biz.MessagePriority(body.value),
-                Details: biz.MessageDetails(body.value) + CardCode
+                Details: biz.MessageDetails(body.value) + CardCode,
+                Notes: req.body.text
             }
 
             sl.PostActivity(options, function (error, response, body) {
