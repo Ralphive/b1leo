@@ -78,7 +78,7 @@ app.post('/Message', function (req, res) {
  * If set, it also sends an Internal B1 Message
  */
 app.post('/MessageWithAction', function (req, res) {
-    console.log("REQUEST: Classify Text with Leo: " + req.body.text)
+    console.log("REQUEST: Classify Text with Leo and perform Actions: " + req.body.text)
     leo.Classify(req.body.text, function (error, response, body) {
         if (error) {
             body = { error: error };
