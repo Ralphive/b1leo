@@ -55,4 +55,4 @@ Access the app from the URL route shown in the terminal
 There is a sample implementation [running here](https://b1leo.cfapps.eu10.hana.ondemand.com/). Be advised that the B1 System Backend is not running 24/7
 
 # License
-cfDemoSummit18  is released under the terms of the MIT license. See [LICENSE](LICENSE) for more information or see https://opensource.org/licenses/MIT.
+b1leo  is released under the terms of the MIT license. See [LICENSE](LICENSE) for more information or see https://opensource.org/licenses/MIT.
