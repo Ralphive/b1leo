@@ -1,4 +1,4 @@
-# B1Leo
+# B1Leo - A Simple Integration between SAP Business One and SAP Leonardo
 [![SAP](https://i.imgur.com/HBBBde7.png)](https://cloudplatform.sap.com)
 
 This is a sample integration of SAP Business One with SAP Leonardo. It uses SAP Leonardo APIs to classify a given input text (As complaint or compliment for example) and then creates an Activity within SAP Business One with a specific priority. In case of a complaint, it also sends a message to the B1 User
@@ -52,8 +52,7 @@ $ cf restart <your app name set on the manifest.yml>
 Access the app from the URL route shown in the terminal
 
 # Demo app
-There is a sample implementation [running here]
-(https://b1leo.cfapps.eu10.hana.ondemand.com/). Be advised that the B1 System Backend is not running 24/7
+There is a sample implementation [running here](https://b1leo.cfapps.eu10.hana.ondemand.com/). Be advised that the B1 System Backend is not running 24/7
 
 # License
 cfDemoSummit18  is released under the terms of the MIT license. See [LICENSE](LICENSE) for more information or see https://opensource.org/licenses/MIT.
