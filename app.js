@@ -34,15 +34,20 @@ app.get('/', function (req, res) {
 
 app.get('/Items', function (req, res) {
     console.log("REQUEST: List Items")
-    res.setHeader('Content-Type', 'application/json')
-    res.status(200)
-    res.send({ message: "List of items" })
+    
+    sl.GetItems({}, function (error, response) {
+        res.setHeader('Content-Type', 'application/json')
+        res.status(200)
+        res.send(response)
+    })
 });
 
 var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
+
+slConnect();
 
 function slConnect() {
     //Connect to SL and store a SessionID
