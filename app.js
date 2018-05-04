@@ -21,7 +21,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 /* Load Local Modules */
-const sl = require('./modules/serviceLayer');
+const sl = require('./modules/erp/b1');
+const byd = require('./modules/erp/byd');
 const leo = require('./modules/leo');
 const biz = require('./modules/biz');
 
@@ -36,7 +37,7 @@ app.get('/', function (req, res) {
 app.get('/Items', function (req, res) {
     console.log("REQUEST: List Items")
     
-    sl.GetItems({}, function (error, response) {
+    byd.GetItems({}, function (error, response) {
         res.setHeader('Content-Type', 'application/json')
         res.status(200)
         res.send(response)
@@ -47,3 +48,4 @@ var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
+

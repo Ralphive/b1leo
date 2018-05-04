@@ -21,9 +21,9 @@ client.on('connect', function () {
 });
 
 //Hash Keys for Redis DB
-const hash_Session = "SessionID"
-const hash_Timeout = "Timeout"
-const timout_exp = "Expire"
+const hash_Session = "b1_SessionID"
+const hash_Timeout = "b1_Timeout"
+const timout_exp = "b1_Expire"
 
 
 //Load Environment Variables
@@ -33,23 +33,23 @@ function ServiceLayerRequest(options, callback) {
 
     console.log("Preparing Service Layer Request:" + JSON.stringify(options))
 
-    getSLSessionCache().then(function (cookies) {
+    getCookiesCache().then(function (cookies) {
         options.headers = { 'Cookie': cookies };
 
         request(options, function (error, response, body) {
-            if(error){
+            if (error) {
                 console.error(error.message)
-            }else{
-                if (response.statusCode == 401){
+            } else {
+                if (response.statusCode == 401) {
                     //Invalid Session
                     Connect().then(function () {
                         ServiceLayerRequest(options, callback)
-                    }).catch(function(error, response){
+                    }).catch(function (error, response) {
                         callback(error, response)
                     })
+                    console.log("Request response with status: " + response.statusCode +
+                        "\nRequest headers: " + JSON.stringify(response.headers))
                 }
-                console.log("Request response with status: " + response.statusCode +
-                "\nRequest headers: " + JSON.stringify(response.headers))
             }
             callback(error, response, body);
         });
@@ -57,7 +57,7 @@ function ServiceLayerRequest(options, callback) {
         .catch(function () {
             Connect().then(function () {
                 ServiceLayerRequest(options, callback)
-            }).catch(function(error, response){
+            }).catch(function (error, response) {
                 callback(error, response)
             })
         })
@@ -98,13 +98,13 @@ let Connect = function () {
         //Set HTTP Request Options
         options = { uri: uri, body: JSON.stringify(data) }
         console.log("Connecting to SL on " + uri);
-        
+
         //Make Request
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 console.log("Connected to SL Succeeded!")
                 body = JSON.parse(body)
-                setSLSessionCache(response.headers['set-cookie'], function () {
+                setCookiesCache(response.headers['set-cookie'], function () {
                     setSLSessionTimeout(body.SessionTimeout)
                     resolve();
                 });
@@ -119,7 +119,7 @@ let Connect = function () {
 
 }
 
-let getSLSessionCache = function () {
+let getCookiesCache = function () {
     return new Promise(function (resolve, reject) {
 
         client.hget(hash_Timeout, timout_exp, function (error, expire) {
@@ -142,7 +142,7 @@ let getSLSessionCache = function () {
     })
 }
 
-function setSLSessionCache(cookies, callback) {
+function setCookiesCache(cookies, callback) {
     // Dump Previous SL Session ID Cache and creates a new one
     client.del(hash_Session, function () {
         client.rpush(hash_Session, cookies, function () {
@@ -155,7 +155,7 @@ function setSLSessionCache(cookies, callback) {
 function setSLSessionTimeout(timeout) {
     //Store the Session Timeout
     client.hset(hash_Timeout, hash_Timeout, timeout)
-    
+
     //Calculates and store when session will be expired
     var expire = moment(moment.now()).add(timeout, 'minutes')
     client.hset(hash_Timeout, timout_exp, expire.format())
