@@ -1,6 +1,7 @@
 /* Service Layer module to interact with B1 Data */
 /* Server Configuration and User Credentials set in environment variables */
-/* Session and Node ID stored in Redis cache databse */
+/* Session and Node ID stored in Redis cache database */
+
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
@@ -43,7 +44,7 @@ function ServiceLayerRequest(options, callback) {
         });
     })
         .catch(function () {
-            Connect2().then(function () {
+            Connect().then(function () {
                 ServiceLayerRequest(options, callback)
             })
         })
@@ -69,7 +70,7 @@ function GetItems(options, callback) {
     });
 }
 
-let Connect2 = function () {
+let Connect = function () {
     return new Promise(function (resolve, reject) {
         var uri = SLServer + "/Login"
         var resp = {}
@@ -84,10 +85,11 @@ let Connect2 = function () {
         //Set HTTP Request Options
         options = { uri: uri, body: JSON.stringify(data) }
         console.log("Connecting to SL on " + uri);
-
+        
         //Make Request
         request.post(options, function (error, response, body) {
             if (!error && response.statusCode == 200) {
+                console.log("Connected to SL Succeeded!")
                 body = JSON.parse(body)
                 setSLSessionCache(response.headers['set-cookie'], function () {
                     setSLSessionTimeout(body.SessionTimeout)
@@ -96,7 +98,7 @@ let Connect2 = function () {
 
             } else {
                 console.error("Connection to Service Layer failed. \n" + response.statusCode + " - " + error)
-                reject(response.statusMessage, response);
+                reject(error, response);
             }
         });
 
@@ -110,16 +112,17 @@ let getSLSessionCache = function () {
         client.hget(hash_Timeout, timout_exp, function (error, expire) {
             if (moment().isAfter(expire)) {
                 //SessionID cached is expired or Doesn't Exist
-                console.lot("Cached session ID Expired")
+                console.log("Cached SL Session ID Expired")
                 reject()
             } else {
                 client.lrange(hash_Session, 0, -1, function (err, cookies) {
                     if (cookies.length > 0) {
+                        console.log("Cached SL Session Retrieved")
                         resolve(cookies)
                     } else {
+                        console.log("Cached SL not found")
                         reject();
                     }
-
                 });
             }
         })
@@ -134,13 +137,12 @@ function setSLSessionCache(cookies, callback) {
             callback();
         });
     })
-
 }
 
 function setSLSessionTimeout(timeout) {
-    //Store the timeout
+    //Store the Session Timeout
     client.hset(hash_Timeout, hash_Timeout, timeout)
-
+    
     //Calculates and store when session will be expired
     var expire = moment(moment.now()).add(timeout, 'minutes')
     client.hset(hash_Timeout, timout_exp, expire.format())
@@ -149,6 +151,7 @@ function setSLSessionTimeout(timeout) {
 
 function updateSLSessionTimeout() {
     //Calculates and store when session will be expired
+    console.log("Updating SL Session Expiration date in cache")
     client.hget(hash_Timeout, hash_Timeout, function (error, reply) {
         if (error) {
             console.error("Can't Update Session Timeout in Redis " + error)
