@@ -47,15 +47,6 @@ app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
 
-slConnect();
+//slConnect();
 
-function slConnect() {
-    //Connect to SL and store a SessionID
-    sl.Connect(function (error, resp, cookie) {
-        if (error) {
-            slSession
-        } else {
-            slSession = cookie;
-        }
-    });
-}
+   // sl.Connect()
