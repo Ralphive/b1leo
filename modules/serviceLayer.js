@@ -37,15 +37,28 @@ function ServiceLayerRequest(options, callback) {
         options.headers = { 'Cookie': cookies };
 
         request(options, function (error, response, body) {
-            console.log("Request response with status: " + response.statusCode +
+            if(error){
+                console.error(error.message)
+            }else{
+                if (response.statusCode == 401){
+                    //Invalid Session
+                    Connect().then(function () {
+                        ServiceLayerRequest(options, callback)
+                    }).catch(function(error, response){
+                        callback(error, response)
+                    })
+                }
+                console.log("Request response with status: " + response.statusCode +
                 "\nRequest headers: " + JSON.stringify(response.headers))
-
+            }
             callback(error, response, body);
         });
     })
         .catch(function () {
             Connect().then(function () {
                 ServiceLayerRequest(options, callback)
+            }).catch(function(error, response){
+                callback(error, response)
             })
         })
 }

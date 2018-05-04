@@ -1,3 +1,5 @@
+/** App Initial Configuration **/
+
 /* Load NodeJS Modules */
 const express = require('express');
 const path = require('path');
@@ -14,6 +16,10 @@ app.use(function (req, res, next) {
     next();
 });
 
+//To Support body on post requests
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 /* Load Local Modules */
 const sl = require('./modules/serviceLayer');
 const leo = require('./modules/leo');
@@ -21,11 +27,6 @@ const biz = require('./modules/biz');
 
 //create Redis Client
 var output = {};
-
-//To Support body on post requests
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
 
 // Root path to retrieve Index.html
 app.get('/', function (req, res) {
@@ -46,7 +47,3 @@ var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
-
-//slConnect();
-
-   // sl.Connect()
