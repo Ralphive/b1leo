@@ -36,8 +36,7 @@ app.get('/', function (req, res) {
 
 app.get('/Items', function (req, res) {
     console.log("REQUEST: List Items")
-    
-    byd.GetItems({}, function (error, response) {
+    biz.GetItems({}, function (error, response) {
         res.setHeader('Content-Type', 'application/json')
         res.status(200)
         res.send(response)

@@ -1,19 +1,31 @@
-/* Biz Logic Functions */
-module.exports = {
-    MessagePriority: function (classification) {
-        return (MessagePriority(classification));
-    },
-    MessageDetails: function (classification) {
-        return (MessageDetails(classification));
-    },
-    RequireMessage: function (priority) {
-        return (RequireMessage(priority));
-    },
+/**
+ * Biz Logic functions 
+ * this module is a "Middleware" to talk with multiple backend systems
+ * it also normalizes and combine the different data structures from B1 and ByD
+ * so the output data has a standard b1 format.
+ */
 
-    FormatMessage: function (activity) {
-        return (FormatMessage(activity));
+const b1  = require("./erp/b1")
+const byd = require("./erp/byd")
+
+
+ module.exports = {
+    GetItems: function (options, callback) {
+        return (GetItems(options, callback))
     }
+}
 
+function GetItems(options,callback){
+    byd.GetItems({}, function (error, itemsByD) {
+        b1.GetItems({}, function (error, itemsB1) {
+                var output = {
+                B1: itemsB1,
+                ByD: itemsByD
+            }
+            callback(null, output)
+        })
+        
+    })
 }
 
 function MessagePriority(classification) {
