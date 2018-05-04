@@ -97,9 +97,11 @@ function GetItems(options, callback) {
 
     var reqopt = ByDHeader;
     reqopt.uri = ByDServer + model_items
+    reqopt.uri += "&$select=InternalID,Description,BaseMeasureUnitCode"
 
-    if (options.hasOwnProperty('filter')) {
-        reqopt.uri += "&" + options.filter
+
+    if (options.hasOwnProperty('skip')) {
+        reqopt.uri += "&" + options.skip
     }
 
     ByDRequest(reqopt, function (error, response, body) {
