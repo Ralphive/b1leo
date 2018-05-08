@@ -2,26 +2,20 @@
 /* Server Configuration and User Credentials set in environment variables */
 /* Session and Node ID stored in Redis cache database */
 
+var client; // Redis Client
+
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
     },
     GetOrders: function (options, callback) {
         return (GetOrders(options, callback))
-    }
+    },
+    setClient: function (inClient) { client = inClient; }
 }
-
 const request = require('request')  // HTTP Client
-const redis = require('redis')      // Cache db
 const moment = require('moment')    // Date Time manipulation
 
-
-
-//Set Redis (cache DB) client
-let client = redis.createClient();
-client.on('connect', function () {
-    console.log("Connected to Redis...")
-});
 
 //Hash Keys for Redis DB
 const hash_Session = "b1_SessionID"

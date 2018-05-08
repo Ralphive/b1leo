@@ -1,7 +1,7 @@
 {
-  "name": "b1leo",
+  "name": "smbmkt",
   "version": "1.0.0",
-  "description": " B1 Integration with SAP Leonardo Ticketing API ",
+  "description": " Smb Marketplace ",
   "main": "app.js",
   "scripts": {
     "test": "node app.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ralphive/b1leo.git"
+    "url": "git+https://github.com/B1SA/smbmkt.git"
   },
   "keywords": [
     "ml",
@@ -25,9 +25,9 @@
   "author": "Ralph Oliveira - @Ralphive",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ralphive/b1leo/issues"
+    "url": "https://github.com/B1SA/smbmkt/issues"
   },
-  "homepage": "https://github.com/Ralphive/b1leo#readme",
+  "homepage": "https://github.com/B1SA/smbmkt#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",

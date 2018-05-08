@@ -1,5 +1,7 @@
 /* Module to manipulate ByD data */
 
+var client; //Redis Client
+
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
@@ -7,17 +9,11 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
+    setClient: function (inClient) { client = inClient; }
 }
 
 const request = require('request')  // HTTP Client
-const redis = require('redis')      // Cache db
 const moment = require('moment')    // Date Time manipulation
-
-//Set Redis (cache DB) client
-let client = redis.createClient();
-client.on('connect', function () {
-    console.log("Connected to Redis...")
-});
 
 //Hash Keys for Redis DB
 const hash_Session = "byd_SessionID"
@@ -57,7 +53,7 @@ function ByDRequest(options, callback) {
             } else {
                 if (response.statusCode == 403) {
                     //Invalid Token
-                    
+
                     Connect().then(function () {
                         ByDRequest(options, callback)
                     }).catch(function (error, response) {
@@ -79,10 +75,10 @@ function ByDRequest(options, callback) {
                     } else {
                         console.log("Request response with status: " + response.statusCode +
                             "\nRequest headers: " + JSON.stringify(response.headers))
-                            
-                            setCookiesCache(response.headers['set-cookie'], function () {
-                                setByDToken(response.headers["x-csrf-token"])
-                            });
+
+                        setCookiesCache(response.headers['set-cookie'], function () {
+                            setByDToken(response.headers["x-csrf-token"])
+                        });
                     }
                     callback(error, response, JSON.parse(body));
                 })
@@ -108,9 +104,9 @@ function GetItems(options, callback) {
     }
 
     ByDRequest(reqopt, function (error, response, body) {
-        if (error){
+        if (error) {
             callback(error);
-        }else{
+        } else {
             callback(null, body);
         }
     });
@@ -128,9 +124,9 @@ function GetSalesOrders(options, callback) {
     }
 
     ByDRequest(reqopt, function (error, response, body) {
-        if (error){
+        if (error) {
             callback(error);
-        }else{
+        } else {
             callback(null, body);
         }
     });
@@ -149,7 +145,7 @@ let Connect = function () {
         var options = ByDHeader;
         options.uri = ByDServer + model_sales
 
-        console.log("Reaching ByD on " +  options.uri);
+        console.log("Reaching ByD on " + options.uri);
 
         //Make Request
         request.get(options, function (error, response, body) {
