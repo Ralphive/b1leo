@@ -5,26 +5,27 @@
  * so the output data has a standard b1 format.
  */
 
-const b1  = require("./erp/b1")
+const b1 = require("./erp/b1")
 const byd = require("./erp/byd")
+const normalize = require("./normalize")
 
 
- module.exports = {
+module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
     }
 }
 
-function GetItems(options,callback){
+function GetItems(options, callback) {
     byd.GetItems({}, function (error, itemsByD) {
         b1.GetItems({}, function (error, itemsB1) {
-                var output = {
-                B1: itemsB1,
-                ByD: itemsByD
+            var output = {
+                b1: itemsB1.value,
+                byd: itemsByD
             }
-            callback(null, output)
+            callback(null, normalize.Items(output))
         })
-        
+
     })
 }
 
@@ -73,7 +74,7 @@ function FormatMessage(activity) {
             }
         ],
         Subject: activity.Details,
-        Text:  activity.Details,
+        Text: activity.Details,
     });
 
 }

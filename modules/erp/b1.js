@@ -66,7 +66,7 @@ function ServiceLayerRequest(options, callback) {
 function GetItems(options, callback) {
 
     options.uri = SLServer + "/Items"
-    options.uri += "?$select=ItemCode,ItemName,ItemPrices,SalesUnit"
+    options.uri += "?$select=ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
 
     options.method = "GET"
 
