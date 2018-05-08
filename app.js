@@ -1,32 +1,52 @@
 /** App Initial Configuration **/
 
 /* Load NodeJS Modules */
-const express   = require('express');
-const path      = require('path');
+const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
-const redis     = require("redis")
+const redis = require("redis")
+const pg = require("pg")
+
 /* Load Local Modules */
-const b1    = require('./modules/erp/b1');
-const byd   = require('./modules/erp/byd');
-const leo   = require('./modules/leo');
-const biz   = require('./modules/biz');
+const b1 = require('./modules/erp/b1');
+const byd = require('./modules/erp/byd');
+const leo = require('./modules/leo');
+const biz = require('./modules/biz');
+const sql = require('./modules/sql');
 
 /* Configure Redis */
 console.log("Configuring redis")
 var credentials = null;
+var vcap = null;
 if (process.env.VCAP_SERVICES) {
     credentials = {}
-    var env = JSON.parse(process.env.VCAP_SERVICES);
-    credentials = env['redis'][0].credentials;
+    vcap = JSON.parse(process.env.VCAP_SERVICES);
+    credentials = vcap['redis'][0].credentials;
     credentials.host = credentials.hostname
     console.log("Redis credentials found in VCAP")
 };
-var client = redis.createClient(credentials);
-client.on('connect', function () {
+var redisClient = redis.createClient(credentials);
+redisClient.on('connect', function () {
     console.log("Connected to Redis")
-    b1.setClient(client)
-    byd.setClient(client)
+    b1.setClient(redisClient)
+    byd.setClient(redisClient)
 });
+
+/* Configure PostgreSQL */
+credentials = null;
+if (vcap) {
+    credentials = { connectionString: vcap_services.postgresql[0].credentials.uri }
+    console.log("Postgree credentials found in VCAP")
+};
+var pgClient = new pg.Client(credentials)
+pgClient.connect(function (err) {
+    if (err) {
+        console.error("Error Connecting to PostgreSQL - \n" + err)
+    } else {
+        console.log('PostegreSQL connected')
+        sql.setClient(pgClient);
+    }
+})
 
 /* Configure Express App */
 console.log("Configuring Express App")
