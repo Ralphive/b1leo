@@ -5,6 +5,9 @@
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
+    },
+    GetOrders: function (options, callback) {
+        return (GetOrders(options, callback))
     }
 }
 
@@ -71,7 +74,37 @@ function GetItems(options, callback) {
     options.method = "GET"
 
     if (options.hasOwnProperty('filter')) {
-        options.uri += options.filter
+        options.uri +="&$filter="+ options.filter
+    }
+    
+    if (options.hasOwnProperty('skip')) {
+        options.uri +="&$skip="+ options.skip
+    }
+
+    ServiceLayerRequest(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            body = JSON.parse(body);
+            delete body["odata.metadata"];
+            callback(null, body);
+        } else {
+            callback(error);
+        }
+    });
+}
+
+function GetOrders(options, callback) {
+
+    options.uri = SLServer + "/Orders"
+    //options.uri += "?$select=ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
+
+    options.method = "GET"
+
+    if (options.hasOwnProperty('filter')) {
+        options.uri +="&$filter="+ options.filter
+    }
+    
+    if (options.hasOwnProperty('skip')) {
+        options.uri +="&$skip="+ options.skip
     }
 
     ServiceLayerRequest(options, function (error, response, body) {

@@ -1,6 +1,9 @@
 module.exports = {
     Items: function (data, callback) {
         return (NormalizeData("Items", data))
+    },
+    SalesOrders: function (data, callback) {
+        return (NormalizeData("SalesOrders", data))
     }
 }
 

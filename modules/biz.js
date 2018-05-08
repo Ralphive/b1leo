@@ -13,17 +13,33 @@ const normalize = require("./normalize")
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
-    }
+    },
+    GetSalesOrders: function (options, callback) {
+        return (GetSalesOrders(options, callback))
+    },
 }
 
 function GetItems(options, callback) {
-    byd.GetItems({}, function (error, itemsByD) {
-        b1.GetItems({}, function (error, itemsB1) {
+    byd.GetItems(options, function (error, itemsByD) {
+        b1.GetItems(options, function (error, itemsB1) {
             var output = {
                 b1: itemsB1.value,
                 byd: itemsByD.d.results
             }
             callback(null, normalize.Items(output))
+        })
+
+    })
+}
+
+function GetSalesOrders(options, callback) {
+    byd.GetSalesOrders(options, function (error, itemsByD) {
+        b1.GetOrders(options, function (error, itemsB1) {
+            var output = {
+                b1: itemsB1.value,
+                byd: itemsByD.d.results
+            }
+            callback(null, normalize.SalesOrders(output))
         })
 
     })

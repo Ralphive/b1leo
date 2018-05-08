@@ -3,7 +3,10 @@
 module.exports = {
     GetItems: function (options, callback) {
         return (GetItems(options, callback))
-    }
+    },
+    GetSalesOrders: function (options, callback) {
+        return (GetSalesOrders(options, callback))
+    },
 }
 
 const request = require('request')  // HTTP Client
@@ -102,6 +105,26 @@ function GetItems(options, callback) {
 
     if (options.hasOwnProperty('skip')) {
         reqopt.uri += "&" + options.skip
+    }
+
+    ByDRequest(reqopt, function (error, response, body) {
+        if (error){
+            callback(error);
+        }else{
+            callback(null, body);
+        }
+    });
+}
+
+function GetSalesOrders(options, callback) {
+
+    var reqopt = ByDHeader;
+    reqopt.uri = ByDServer + model_sales
+    //reqopt.uri += "&$select=InternalID,Description,BaseMeasureUnitCode"
+
+
+    if (options.hasOwnProperty('skip')) {
+        reqopt.uri += "&$skip=" + options.skip
     }
 
     ByDRequest(reqopt, function (error, response, body) {
