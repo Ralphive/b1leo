@@ -21,7 +21,7 @@ function GetItems(options, callback) {
         b1.GetItems({}, function (error, itemsB1) {
             var output = {
                 b1: itemsB1.value,
-                byd: itemsByD
+                byd: itemsByD.d.results
             }
             callback(null, normalize.Items(output))
         })
