@@ -68,17 +68,16 @@ function GetItems(options, callback) {
     options.method = "GET"
 
     if (options.hasOwnProperty('filter')) {
-        options.uri +="&$filter="+ options.filter
+        options.uri += "&$filter=" + options.filter
     }
-    
+
     if (options.hasOwnProperty('skip')) {
-        options.uri +="&$skip="+ options.skip
+        options.uri += "&$skip=" + options.skip
     }
 
     ServiceLayerRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.parse(body);
-            delete body["odata.metadata"];
+            body = formatOdata(JSON.parse(body));
             callback(null, body);
         } else {
             callback(error);
@@ -94,17 +93,16 @@ function GetOrders(options, callback) {
     options.method = "GET"
 
     if (options.hasOwnProperty('filter')) {
-        options.uri +="&$filter="+ options.filter
+        options.uri += "&$filter=" + options.filter
     }
-    
+
     if (options.hasOwnProperty('skip')) {
-        options.uri +="&$skip="+ options.skip
+        options.uri += "&$skip=" + options.skip
     }
 
     ServiceLayerRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.parse(body);
-            delete body["odata.metadata"];
+            body = formatOdata(JSON.parse(body));
             callback(null, body);
         } else {
             callback(error);
@@ -202,4 +200,20 @@ function updateSLSessionTimeout() {
             client.hset(hash_Timeout, timout_exp, expire.format())
         }
     })
+}
+
+function formatOdata(body) {
+    
+    if (body.hasOwnProperty("odata.metadata")){
+        delete body["odata.metadata"];
+    }
+
+
+    if (body.hasOwnProperty("odata.nextLink")) {
+        var nextLink = body["odata.nextLink"]
+        body["odata.nextLink"] = nextLink.substr(nextLink.indexOf("$skip"), nextLink.length)
+    }
+
+    return body;
+
 }

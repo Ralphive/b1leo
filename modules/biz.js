@@ -39,9 +39,6 @@ function GetItems(options, callback) {
             if(itemsB1.hasOwnProperty("odata.nextLink")){
                 output.b1["odata.nextLink"] = itemsB1["odata.nextLink"];
             }
-
-
-
             callback(null, normalize.Items(output))
         })
 
@@ -59,6 +56,11 @@ function GetSalesOrders(options, callback) {
         })
 
     })
+}
+
+function LoadVectorDB(){
+
+
 }
 
 function MessagePriority(classification) {
