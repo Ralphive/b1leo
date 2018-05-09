@@ -125,7 +125,7 @@ let Connect = function () {
         };
 
         //Set HTTP Request Options
-        options = { uri: uri, body: JSON.stringify(data) }
+        options = { uri: uri, body: JSON.stringify(data), timeout: 10000 }
         console.log("Connecting to SL on " + uri);
 
         //Make Request
@@ -139,7 +139,7 @@ let Connect = function () {
                 });
 
             } else {
-                console.error("Connection to Service Layer failed. \n" + response.statusCode + " - " + error)
+                console.error("Connection to Service Layer failed. \n" + error.message)
                 reject(error, response);
             }
         });

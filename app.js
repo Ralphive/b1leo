@@ -88,6 +88,29 @@ app.get('/SalesOrders', function (req, res) {
     })
 });
 
+app.post('/Initialize', function (req, res) {
+    console.log("POST REQUEST: Initialize System")
+    
+    var output = {
+        database: false,
+        vectors: false,
+        message: ""
+    };
+    res.setHeader('Content-Type', 'application/json')
+    sql.Initialize(function (err) {
+        if (err){
+            output.message = err;
+            res.status(500)
+            res.send(output)
+        }else{
+            output.database = true;
+            res.status(200)
+            res.send(output)
+        }
+    })
+});
+
+
 var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);

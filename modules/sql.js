@@ -4,7 +4,7 @@ var pgClient;
 
 module.exports = {
     Initialize: function (response) {
-        return (Connect(response));
+        return (Initialize(response));
     },
     Select: function (response) {
         return (Select(response));
@@ -15,32 +15,29 @@ module.exports = {
     Update: function (item, response) {
         return (Update(item, response));
     },
-    setClient: function (inClient) { client = inClient;}
+    setClient: function (inClient) { pgClient = inClient;}
 
 }
 
-function Initialize(){
+function Initialize(callback){
+    console.log('Initializing PostgreSQL database')
+    
+    var query   = 'CREATE TABLE IF NOT EXISTS '
+                + 'items (code varchar(256) NOT NULL, origin varchar(10) NOT NULL, imgvector decimal array,'
+                + 'PRIMARY KEY (code, origin))'
 
-}
+    if(pgClient){
+        pgClient.query(query, function (err, result) {
+            if (err) {
+                console.error("Error Initializing PostgreSQL db: "+err.message)
+                callback(err.message)
+            }else{
+                console.log('PostgreDB initialized')
+                callback(null)
+            }
+        });
+    }
 
-function Connect(callback) {
-    console.log('PG Connecting')
-    var query = 'CREATE TABLE IF NOT EXISTS items (code varchar(256) NOT NULL, name varchar(256) NOT NULL, integrated boolean NOT NULL)'
-    pgClient.connect(function (err) {
-        console.log('PG Connected')
-        if (err) {
-            console.log(err)
-            callback(err)
-        } else {
-            console.log('PG Creating Table')
-            pgClient.query(query, function (err, result) {
-                console.log('PG Table created')
-                if (err) {
-                    callback(err)
-                }
-            });
-        }
-    });
 }
 
 function Select(callback) {

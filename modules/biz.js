@@ -21,10 +21,18 @@ module.exports = {
 
 function GetItems(options, callback) {
     byd.GetItems(options, function (error, itemsByD) {
+        if (error){
+            itemsByD = {};
+            itemsByD.error = error;
+        }
         b1.GetItems(options, function (error, itemsB1) {
+            if (error){
+                itemsB1 = {};
+                itemsB1.error = error;
+            }
             var output = {
-                b1: itemsB1.value,
-                byd: itemsByD.d.results
+                b1: itemsB1.error || itemsB1.value,
+                byd: itemsByD.error || itemsByD.d.results
             }
             callback(null, normalize.Items(output))
         })
