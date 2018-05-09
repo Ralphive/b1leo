@@ -11,21 +11,21 @@ const normalize = require("./normalize")
 
 
 module.exports = {
-    GetItems: function (options, callback) {
-        return (GetItems(options, callback))
+    GetItems: function (query, callback) {
+        return (GetItems(query, callback))
     },
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
 }
 
-function GetItems(options, callback) {
-    byd.GetItems(options, function (error, itemsByD) {
+function GetItems(query, callback) {
+    byd.GetItems(query, function (error, itemsByD) {
         if (error){
             itemsByD = {};
             itemsByD.error = error;
         }
-        b1.GetItems(options, function (error, itemsB1) {
+        b1.GetItems(query, function (error, itemsB1) {
             if (error){
                 itemsB1 = {};
                 itemsB1.error = error;
@@ -45,9 +45,9 @@ function GetItems(options, callback) {
     })
 }
 
-function GetSalesOrders(options, callback) {
-    byd.GetSalesOrders(options, function (error, itemsByD) {
-        b1.GetOrders(options, function (error, itemsB1) {
+function GetSalesOrders(query, callback) {
+    byd.GetSalesOrders(query, function (error, itemsByD) {
+        b1.GetOrders(query, function (error, itemsB1) {
             var output = {
                 b1: itemsB1.value,
                 byd: itemsByD.d.results
@@ -59,6 +59,8 @@ function GetSalesOrders(options, callback) {
 }
 
 function LoadVectorDB(){
+    //** Load all existent items and store them in the database */
+
 
 
 }

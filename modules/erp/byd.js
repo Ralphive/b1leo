@@ -14,6 +14,7 @@ module.exports = {
 
 const request = require('request')  // HTTP Client
 const moment = require('moment')    // Date Time manipulation
+const odata = require('../odata')
 
 //Hash Keys for Redis DB
 const hash_Session = "byd_SessionID"
@@ -26,7 +27,7 @@ const model_items = "/byd_items/MaterialCollection?$format=json"
 //Load Environment Variables
 const ByDServer = process.env.BYD_SERVER + ":" + process.env.BYD_PORT + process.env.BYD_PATH;
 const ByDHeader = {
-    uri: ByDServer,
+    url: ByDServer,
     method: "GET",
     headers: {
         "Accept": "application/json",
@@ -92,18 +93,14 @@ function ByDRequest(options, callback) {
         })
 }
 
-function GetItems(options, callback) {
+function GetItems(query, callback) {
+    var options = ByDHeader
+    var select = "" //"InternalID,Description,BaseMeasureUnitCode"
 
-    var reqopt = ByDHeader;
-    reqopt.uri = ByDServer + model_items
-    reqopt.uri += "&$select=InternalID,Description,BaseMeasureUnitCode"
+    options.url = ByDServer + model_items
+    options.qs = odata.formatQuery(query, select)
 
-
-    if (options.hasOwnProperty('skip')) {
-        reqopt.uri += "&" + options.skip
-    }
-
-    ByDRequest(reqopt, function (error, response, body) {
+    ByDRequest(options, function (error, response, body) {
         if (error) {
             callback(error);
         } else {
@@ -112,18 +109,14 @@ function GetItems(options, callback) {
     });
 }
 
-function GetSalesOrders(options, callback) {
+function GetSalesOrders(query, callback) {
+    var options = ByDHeader
+    var select = ""
 
-    var reqopt = ByDHeader;
-    reqopt.uri = ByDServer + model_sales
-    //reqopt.uri += "&$select=InternalID,Description,BaseMeasureUnitCode"
+    options.url = ByDServer + model_sales
+    options.qs = odata.formatQuery(query, select)
 
-
-    if (options.hasOwnProperty('skip')) {
-        reqopt.uri += "&$skip=" + options.skip
-    }
-
-    ByDRequest(reqopt, function (error, response, body) {
+    ByDRequest(options, function (error, response, body) {
         if (error) {
             callback(error);
         } else {

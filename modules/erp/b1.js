@@ -17,6 +17,9 @@ const request = require('request')  // HTTP Client
 const moment = require('moment')    // Date Time manipulation
 
 
+const odata = require("../odata")
+
+
 //Hash Keys for Redis DB
 const hash_Session = "b1_SessionID"
 const hash_Timeout = "b1_Timeout"
@@ -60,24 +63,16 @@ function ServiceLayerRequest(options, callback) {
         })
 }
 
-function GetItems(options, callback) {
-
-    options.uri = SLServer + "/Items"
-    options.uri += "?$select=ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
-
+function GetItems(query, callback) {
+    var options = {}
+    var select = "ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
+    options.url = SLServer + "/Items"
     options.method = "GET"
-
-    if (options.hasOwnProperty('filter')) {
-        options.uri += "&$filter=" + options.filter
-    }
-
-    if (options.hasOwnProperty('skip')) {
-        options.uri += "&$skip=" + options.skip
-    }
+    options.qs = odata.formatQuery(query,select)
 
     ServiceLayerRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = formatOdata(JSON.parse(body));
+            body = odata.formatResponse(JSON.parse(body));
             callback(null, body);
         } else {
             callback(error);
@@ -85,24 +80,17 @@ function GetItems(options, callback) {
     });
 }
 
-function GetOrders(options, callback) {
+function GetOrders(query, callback) {
+    var options = {}
+    var select = ""
 
-    options.uri = SLServer + "/Orders"
-    //options.uri += "?$select=ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
-
+    options.url = SLServer + "/Orders"
     options.method = "GET"
-
-    if (options.hasOwnProperty('filter')) {
-        options.uri += "&$filter=" + options.filter
-    }
-
-    if (options.hasOwnProperty('skip')) {
-        options.uri += "&$skip=" + options.skip
-    }
+    options.qs = odata.formatQuery(query,select)
 
     ServiceLayerRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = formatOdata(JSON.parse(body));
+            body = odata.formatResponse(JSON.parse(body));
             callback(null, body);
         } else {
             callback(error);
@@ -202,18 +190,3 @@ function updateSLSessionTimeout() {
     })
 }
 
-function formatOdata(body) {
-    
-    if (body.hasOwnProperty("odata.metadata")){
-        delete body["odata.metadata"];
-    }
-
-
-    if (body.hasOwnProperty("odata.nextLink")) {
-        var nextLink = body["odata.nextLink"]
-        body["odata.nextLink"] = nextLink.substr(nextLink.indexOf("$skip"), nextLink.length)
-    }
-
-    return body;
-
-}
