@@ -1,5 +1,5 @@
 module.exports = {
-    VectorizeDB: function(origin, callback){
+    VectorizeDB: function (origin, callback) {
         return VectorizeDB(origin, callback)
     },
     Classify: function (text, callback) {
@@ -7,23 +7,12 @@ module.exports = {
     }
 }
 
-var req = require('request') // HTTP Client
+var request = require('request') // HTTP Client
+var fs = require('fs')
+var path = require('path') 
+
 var sql = require('./sql')
-
 var LeoServer = process.env.LEO_SERVER || "https://sandbox.api.sap.com/ml"
-
-function VectorizeDB(origin, callback){
-    sql.SelectErpItems(origin, function(err, result){
-        if (err){
-            console.log("Can't select items to vectorize from "+origin)
-            callback(err)
-        }{
-            callback(result)
-        }
-    })
-
-
-}
 
 
 function Classify(text, callback) {
@@ -62,13 +51,13 @@ function Classify(text, callback) {
         if (!error && response.statusCode == 200) {
             var classification = body.results[0].classification[0]
             console.log(
-                "Text "+(classification.confidence * 100) + "% classified as a "
-                    + classification.value)
+                "Text " + (classification.confidence * 100) + "% classified as a "
+                + classification.value)
             return callback(null, response, classification);
         } else {
             console.error("Can't Analyse text due: " + body.status_message);
             console.error("Request Status Code: " + response.statusCode)
-            return callback(body.status_message,response,null);
+            return callback(body.status_message, response, null);
         }
     });
 }

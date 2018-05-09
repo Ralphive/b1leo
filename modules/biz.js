@@ -6,6 +6,7 @@
  */
 
 const qs = require("qs")
+const path = require("path")
 
 const sql   = require("./sql")
 const leo   = require("./leo")
@@ -22,8 +23,8 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
-    LoadVectorDB: function () {
-        return (LoadVectorDB())
+    FormatFileName: function (row) {
+        return (FormatFileName(row))
     },
 }
 
@@ -64,56 +65,6 @@ function GetSalesOrders(query, callback) {
     })
 }
 
-function LoadVectorDB() {
-    var erps = ['b1', 'byd']
-
-    for (key in erps) {
-        loadErpItems(erps[key], null, function (origin) {
-            console.log(origin+" Items Loaded")
-            leo.VectorizeDB(origin,function(text){
-                console.log("DB Vectorized")
-            })
-        });
-    }
-}
-
-function loadErpItems(origin, query, callback) {
-    //Load ERP Items and insert them in the app DB
-    if (query) {
-        query = qs.parse(query);
-    }
-
-    erp = eval(origin);
-
-    erp.GetItems(query, function (error, items) {
-        if (error) {
-            items = {};
-            items.error = error;
-        }
-        var output = {};
-        output[origin] = { values: items.error || items.value }
-
-
-        //Update DB
-        InsertItemVectorDB(normalize.Items(output))
-
-        if (items.hasOwnProperty("odata.nextLink")) {
-            output[origin]["odata.nextLink"] = items["odata.nextLink"];
-            loadErpItems(origin, output[origin]["odata.nextLink"], callback);
-        } else {
-            callback(origin)
-        }
-    })
-}
-
-function InsertItemVectorDB(data) {
-    for (property in data) {
-        var values = data[property].values
-        for (var i = 0; i < values.length; i++) {
-            if (!values[i].image || values[i].image == "") { continue }
-
-            values[i].origin = property;
-            sql.Insert(values[i])
-        }
-    }
+function FormatFileName(row){
+    return row.origin + "__-"+row.productid+path.extname(row.image)
 }

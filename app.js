@@ -10,9 +10,9 @@ const pg = require("pg")
 /* Load Local Modules */
 const b1 = require('./modules/erp/b1');
 const byd = require('./modules/erp/byd');
-const leo = require('./modules/leo');
 const biz = require('./modules/biz');
 const sql = require('./modules/sql');
+const start = require('./modules/start')
 
 /* Configure Redis */
 console.log("Configuring redis")
@@ -90,21 +90,11 @@ app.get('/SalesOrders', function (req, res) {
 
 app.post('/Initialize', function (req, res) {
     console.log("POST REQUEST: Initialize System")
+    start.Initialize();
     var output = {
         message: "executing"
     };
     res.setHeader('Content-Type', 'application/json')
-    sql.Initialize(function (err) {
-        if (err){
-            output.message = err;
-            res.status(500)
-            res.send(output)
-        }else{
-            biz.LoadVectorDB();
-            res.status(200)
-            res.send(output)
-        }
-    })
 });
 
 
