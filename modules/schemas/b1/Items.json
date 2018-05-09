@@ -2,7 +2,7 @@
     "ItemCode": "productID",
     "ItemName": "name",
     "QuantityOnStock": "inventoryLevel",
-    "Picture": "image",
+    "User_Text": "image",
     "ItemPrices": [
         {
             "Price": "price",

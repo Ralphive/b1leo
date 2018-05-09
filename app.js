@@ -90,11 +90,8 @@ app.get('/SalesOrders', function (req, res) {
 
 app.post('/Initialize', function (req, res) {
     console.log("POST REQUEST: Initialize System")
-    
     var output = {
-        database: false,
-        vectors: false,
-        message: ""
+        message: "executing"
     };
     res.setHeader('Content-Type', 'application/json')
     sql.Initialize(function (err) {
@@ -103,7 +100,7 @@ app.post('/Initialize', function (req, res) {
             res.status(500)
             res.send(output)
         }else{
-            output.database = true;
+            biz.LoadVectorDB();
             res.status(200)
             res.send(output)
         }

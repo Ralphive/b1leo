@@ -7,7 +7,10 @@
 
 const b1 = require("./erp/b1")
 const byd = require("./erp/byd")
+const qs = require("qs")
+
 const normalize = require("./normalize")
+const sql = require("./sql")
 
 
 module.exports = {
@@ -17,31 +20,33 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
+    LoadVectorDB: function () {
+        return (LoadVectorDB())
+    },
 }
 
 function GetItems(query, callback) {
     byd.GetItems(query, function (error, itemsByD) {
-        if (error){
+        if (error) {
             itemsByD = {};
             itemsByD.error = error;
         }
         b1.GetItems(query, function (error, itemsB1) {
-            if (error){
+            if (error) {
                 itemsB1 = {};
                 itemsB1.error = error;
             }
 
             var output = {
-                b1:  {values: itemsB1.error  || itemsB1.value},
-                byd: {values: itemsByD.error || itemsByD.d.results}
+                b1: { values: itemsB1.error || itemsB1.value },
+                byd: { values: itemsByD.error || itemsByD.d.results }
             }
 
-            if(itemsB1.hasOwnProperty("odata.nextLink")){
+            if (itemsB1.hasOwnProperty("odata.nextLink")) {
                 output.b1["odata.nextLink"] = itemsB1["odata.nextLink"];
             }
             callback(null, normalize.Items(output))
         })
-
     })
 }
 
@@ -54,16 +59,64 @@ function GetSalesOrders(query, callback) {
             }
             callback(null, normalize.SalesOrders(output))
         })
-
     })
 }
 
-function LoadVectorDB(){
-    //** Load all existent items and store them in the database */
+function LoadVectorDB() {
 
+    loadErpItems("b1", null, function () {
+        console.log("B1 Items Loaded")
+        //Starting Vectorizing
+    });
 
-
+    loadErpItems("byd", null, function () {
+        console.log("ByD Items Loaded")
+        //Starting Vectorizing
+    });
 }
+
+function loadErpItems(origin, query, callback) {
+    //Load ERP Items and insert them in the app DB
+    if (query) {
+        query = qs.parse(query);
+    }
+
+    erp = eval(origin);
+
+    erp.GetItems(query, function (error, items) {
+        if (error) {
+            items = {};
+            items.error = error;
+        }
+        var output = {};
+        output[origin] = { values: items.error || items.value }
+
+
+        //Update DB
+        InsertItemVectorDB(normalize.Items(output))
+
+        if (items.hasOwnProperty("odata.nextLink")) {
+            output[origin]["odata.nextLink"] = items["odata.nextLink"];
+            loadErpItems(origin, output[origin]["odata.nextLink"], callback);
+        } else {
+            callback()
+        }
+    })
+}
+
+function InsertItemVectorDB(data) {
+    for (property in data) {
+        var values = data[property].values
+        for (var i = 0; i < values.length; i++) {
+            if (!values[i].image || values[i].image == "") { continue }
+
+            values[i].origin = property;
+            sql.Insert(values[i])
+        }
+    }
+}
+
+
 
 function MessagePriority(classification) {
     /* Set activity priority based on Leonardo Classification */

@@ -13,14 +13,16 @@ function formatQuery(query, select) {
     
     qs = {}
 
-    if (query.hasOwnProperty("$skip")) {
+    if (query && query.hasOwnProperty("$skip")) {
         qs["$skip"] = query["$skip"]
     }
 
-    if (query.hasOwnProperty("$top")) {
+    if (query && query.hasOwnProperty("$top")) {
         qs["$top"] = query["$top"]
-    }else{
-        qs["$top"] = 20
+    }
+
+    if (query && query.hasOwnProperty("$filter")) {
+        qs["$filter"] = query["$filter"]
     }
 
     if(select){
@@ -39,7 +41,8 @@ function formatResponse(body) {
 
     if (body.hasOwnProperty("odata.nextLink")) {
         var nextLink = body["odata.nextLink"]
-        body["odata.nextLink"] = nextLink.replace(process.env.B1_SLPATH_ENV, "");
+        nextLink = nextLink.substr(nextLink.indexOf("?")+1,nextLink.lenght);
+        body["odata.nextLink"] = nextLink
     }
     return body;
 }

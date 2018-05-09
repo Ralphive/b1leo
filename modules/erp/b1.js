@@ -31,7 +31,7 @@ const SLServer = process.env.B1_SERVER_ENV + ":" + process.env.B1_SLPORT_ENV + p
 
 function ServiceLayerRequest(options, callback) {
 
-    console.log("Preparing Service Layer Request:" + JSON.stringify(options))
+    console.log("Preparing Service Layer Request:" +JSON.stringify(options.method) +" - "+JSON.stringify(options.url))
 
     getCookiesCache().then(function (cookies) {
         options.headers = { 'Cookie': cookies };

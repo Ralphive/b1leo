@@ -34,6 +34,9 @@ function NormalizeData(dataType, data) {
 function Normalize(input, format) {
     var data = [];
     var json;
+
+    if (typeof input == 'undefined') {return data};
+
     for (var i = 0; i < input.length; i++) {
         json = input[i];
         var item = {}

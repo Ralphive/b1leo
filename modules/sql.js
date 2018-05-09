@@ -23,8 +23,8 @@ function Initialize(callback){
     console.log('Initializing PostgreSQL database')
     
     var query   = 'CREATE TABLE IF NOT EXISTS '
-                + 'items (code varchar(256) NOT NULL, origin varchar(10) NOT NULL, imgvector decimal array,'
-                + 'PRIMARY KEY (code, origin))'
+                + 'items (productID varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector decimal array,'
+                + 'PRIMARY KEY (productID, origin))'
 
     if(pgClient){
         pgClient.query(query, function (err, result) {
@@ -40,7 +40,7 @@ function Initialize(callback){
 }
 
 function Select(callback) {
-    var query = 'SELECT code, name, integrated FROM items where integrated = false'
+    var query = 'SELECT * FROM items'
     pgClient.query(query, function (err, result) {
         if (err) {
             callback(err)
@@ -51,14 +51,23 @@ function Select(callback) {
 }
 
 function Insert(data, callback) {
-    console.log('PG Inserting Table data '+ JSON.stringify(data))
+    if (!data.hasOwnProperty('imgvector')){
+        data.imgvector = null;
+    }
 
-    var query = 'INSERT INTO items(code,name,integrated) VALUES($1, $2, $3) ON CONFLICT DO NOTHING';
-    pgClient.query(query, [data.code,data.name,false], function (err,result){
+    console.log('PG Inserting Table data for '+data.origin+' item '+ data.productID)
+    
+    var query   = 'INSERT INTO items(productID,origin,image,imgvector) '
+                + 'VALUES($1, $2, $3, $4) '
+                + 'ON CONFLICT (productID,origin) DO UPDATE '
+                + 'SET image = $3'
+
+    pgClient.query(query, [data.productID,data.origin,data.image,data.imgvector], function (err,result){
         if (err) {
-            callback(err)
+            console.error(err)
+            if(typeof callback === "function") {callbakc(err)}
         }else{
-            callback(null, result)
+            if(typeof callback === "function") {callbakc(null, result)}
         }
     });
 }
@@ -66,7 +75,7 @@ function Insert(data, callback) {
 function Update(item, callback) {
     console.log('PG Updating Table data '+ JSON.stringify(item))
 
-    var query = 'UPDATE items SET integrated = true WHERE code = $1';
+    var query = 'UPDATE items SET integrated = true WHERE productID = $1';
     pgClient.query(query, [item], function (err,result){
         if (err) {
             callback(err)
