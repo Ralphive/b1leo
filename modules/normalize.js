@@ -18,13 +18,13 @@ function NormalizeData(dataType, data) {
     for (property in data) {
         var formatPath = path.join(__dirname, 'schemas', property, dataType + ".json")
         console.log("Reading normalization schema for " + property + " from " + formatPath);
+        normData[property] = data[property]
         if (!fs.existsSync(formatPath)) {
             // If there is no schema, don't normalize
             console.error("No normalization schema found for " + path.join('schemas', property, dataType))
-            normData[property] = data[property]
         } else {
             var format = JSON.parse(fs.readFileSync(formatPath, 'utf8'));
-            normData[property] = Normalize(data[property], format)
+            normData[property].values = Normalize(data[property].values, format)
             console.log("Data normalized")
         }
     }

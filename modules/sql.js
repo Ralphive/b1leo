@@ -37,7 +37,6 @@ function Initialize(callback){
             }
         });
     }
-
 }
 
 function Select(callback) {
@@ -54,7 +53,7 @@ function Select(callback) {
 function Insert(data, callback) {
     console.log('PG Inserting Table data '+ JSON.stringify(data))
 
-    var query = 'INSERT INTO items(code,name,integrated) VALUES($1, $2, $3)';
+    var query = 'INSERT INTO items(code,name,integrated) VALUES($1, $2, $3) ON CONFLICT DO NOTHING';
     pgClient.query(query, [data.code,data.name,false], function (err,result){
         if (err) {
             callback(err)

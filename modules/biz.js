@@ -30,10 +30,18 @@ function GetItems(options, callback) {
                 itemsB1 = {};
                 itemsB1.error = error;
             }
+
             var output = {
-                b1: itemsB1.error || itemsB1.value,
-                byd: itemsByD.error || itemsByD.d.results
+                b1:  {values: itemsB1.error  || itemsB1.value},
+                byd: {values: itemsByD.error || itemsByD.d.results}
             }
+
+            if(itemsB1.hasOwnProperty("odata.nextLink")){
+                output.b1["odata.nextLink"] = itemsB1["odata.nextLink"];
+            }
+
+
+
             callback(null, normalize.Items(output))
         })
 
