@@ -1,11 +1,30 @@
 module.exports = {
+    VectorizeDB: function(origin, callback){
+        return VectorizeDB(origin, callback)
+    },
     Classify: function (text, callback) {
         return (Classify(text, callback));
     }
 }
 
 var req = require('request') // HTTP Client
+var sql = require('./sql')
+
 var LeoServer = process.env.LEO_SERVER || "https://sandbox.api.sap.com/ml"
+
+function VectorizeDB(origin, callback){
+    sql.SelectErpItems(origin, function(err, result){
+        if (err){
+            console.log("Can't select items to vectorize from "+origin)
+            callback(err)
+        }{
+            callback(result)
+        }
+    })
+
+
+}
+
 
 function Classify(text, callback) {
     var options = {

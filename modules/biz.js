@@ -5,13 +5,15 @@
  * so the output data has a standard b1 format.
  */
 
-const b1 = require("./erp/b1")
-const byd = require("./erp/byd")
 const qs = require("qs")
 
+const sql   = require("./sql")
+const leo   = require("./leo")
 const normalize = require("./normalize")
-const sql = require("./sql")
 
+
+const b1    = require("./erp/b1")
+const byd   = require("./erp/byd")
 
 module.exports = {
     GetItems: function (query, callback) {
@@ -63,16 +65,16 @@ function GetSalesOrders(query, callback) {
 }
 
 function LoadVectorDB() {
+    var erps = ['b1', 'byd']
 
-    loadErpItems("b1", null, function () {
-        console.log("B1 Items Loaded")
-        //Starting Vectorizing
-    });
-
-    loadErpItems("byd", null, function () {
-        console.log("ByD Items Loaded")
-        //Starting Vectorizing
-    });
+    for (key in erps) {
+        loadErpItems(erps[key], null, function (origin) {
+            console.log(origin+" Items Loaded")
+            leo.VectorizeDB(origin,function(text){
+                console.log("DB Vectorized")
+            })
+        });
+    }
 }
 
 function loadErpItems(origin, query, callback) {
@@ -99,7 +101,7 @@ function loadErpItems(origin, query, callback) {
             output[origin]["odata.nextLink"] = items["odata.nextLink"];
             loadErpItems(origin, output[origin]["odata.nextLink"], callback);
         } else {
-            callback()
+            callback(origin)
         }
     })
 }
@@ -114,56 +116,4 @@ function InsertItemVectorDB(data) {
             sql.Insert(values[i])
         }
     }
-}
-
-
-
-function MessagePriority(classification) {
-    /* Set activity priority based on Leonardo Classification */
-    if (classification == "complaint")
-        return "pr_High";
-    return "pr_Normal";
-}
-
-function MessageDetails(classification) {
-    /* Set activity details based on Leonardo Classification */
-    var details = "";
-    if (classification == "complaint")
-        details = "URGENT ";
-    details += classification.toUpperCase() + " from customer";
-    return details;
-}
-
-function RequireMessage(priority) {
-    /* Priorities of activities which requires a Message to be dispatched */
-    if (priority == "pr_High")
-        return true;
-    return false;
-}
-
-function FormatMessage(activity) {
-    return ({
-        MessageDataColumns: [
-            {
-                ColumnName: "Activity",
-                Link: "tYES",
-                MessageDataLines: [
-                    {
-                        Object: "33", // Activities
-                        ObjectKey: activity.ActivityCode,
-                        Value: "Activity #" + activity.ActivityCode,
-                    }
-                ]
-            }
-        ],
-        RecipientCollection: [
-            {
-                SendInternal: "tYES",
-                UserCode: process.env.B1_USER_ENV
-            }
-        ],
-        Subject: activity.Details,
-        Text: activity.Details,
-    });
-
 }
