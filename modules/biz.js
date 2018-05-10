@@ -8,6 +8,7 @@
 const request = require("request");
 const fs = require("fs");
 const path = require("path")
+const uuid = require('uuid');
 
 const sql = require("./sql")
 const leo = require("./leo")
@@ -42,6 +43,84 @@ module.exports = {
 }
 
 function SimilarItems(body, callback) {
+
+    var output = {}
+    console.log("Dowloading image from: " + body.url)
+    DownloadImage(body.url, uuid.v4() + path.extname(body.url), function (imgPath) {
+        output.message = "Image downloaded on "+imgPath
+        callback(null,output)
+    })
+}
+
+function getSimilatiryScoring(vectors, callback) {
+    vectors = JSON.parse(vectors);
+
+    // Create e zip file of vectors to be used by the Similarity scoring service 
+    var zipFile = uuid.v4() + '.zip';
+
+    // create a file to stream archive data to the zip
+    var output = fs.createWriteStream(path.join(dbDir, zipFile));
+    var archive = archiver('zip', { zlib: { level: 9 } }); // Sets the compression level. 
+
+    // listen for all archive data to be written 
+    output.on('close', function () {
+
+        var options = {
+            url: 'https://sandbox.api.sap.com/ml/similarityscoring/inference_sync',
+            headers: {
+                'APIKey': process.env.LEO_API_KEY,
+                'Accept': 'application/json',
+            },
+            formData: {
+                files: fs.createReadStream(path.join(dbDir, zipFile)),
+                options: "{\"numSimilarVectors\":3}"
+            }
+        }
+
+        request.post(options, function (err, res, body) {
+            if (res.statusCode != 200) {
+                callback(null, JSON.parse(body), res.statusMessage)
+            }
+            else {
+                callback(fileName, JSON.parse(body), null);
+
+            }
+        });
+
+    });
+
+    // good practice to catch warnings (ie stat failures and other non-blocking errors) 
+    archive.on('warning', function (err) {
+        if (err.code === 'ENOENT') {
+            // log warning 
+        } else {
+            // throw error 
+            throw err;
+        }
+    });
+
+    // good practice to catch this error explicitly 
+    archive.on('error', function (err) {
+        throw err;
+    });
+
+    // pipe archive data to the file 
+    archive.pipe(output);
+
+    var buff = Buffer.from(JSON.stringify(vectors.predictions[0].feature_vector), "utf8");
+    var fileName = vectors.predictions[0].name
+    fileName = fileName.substr(0, fileName.indexOf('.')) + '.txt'
+    archive.append(buff, { name: fileName });
+
+    fs.readdirSync(process.env.VECTOR_DIR).forEach(file => {
+        // append txt vector files from stream to the zip 
+        if (file.indexOf('.txt') !== -1) {
+            archive.append(fs.createReadStream(path.join(process.env.VECTOR_DIR, file)), { name: file });
+        }
+    })
+
+    // finalize the archive (ie we are done appending files but streams have to finish yet) 
+    archive.finalize();
 
 }
 

@@ -97,6 +97,19 @@ app.post('/Initialize', function (req, res) {
     res.setHeader('Content-Type', 'application/json')
 });
 
+app.post('/SimilarItems', function (req, res) {
+
+    biz.SimilarItems(req.body, function (err, resp) {
+        if (err) {
+            res.status(500).send(resp)
+        } else {
+            console.dir(resp);
+            res.status(200).send(resp)
+        }
+    });
+    console.log('GetSimilarItems')
+});
+
 
 var port = process.env.PORT || 30000
 app.listen(port, function () {
