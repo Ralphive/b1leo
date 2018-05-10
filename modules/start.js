@@ -89,7 +89,7 @@ function RetrieveImages(origin, callback) {
         } {
             console.log(rows.length + " items found to retrieve images from " + origin)
             for (i in rows) {
-                DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
+                biz.DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
                     leo.extractVectors(imgPath, function (error, vector) {
                         var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
                         rowToUpdate.imgvector = vector.predictions[0].feature_vector
@@ -101,14 +101,4 @@ function RetrieveImages(origin, callback) {
             }
         }
     })
-}
-
-function DownloadImage(uri, filename, callback) {
-    console.log("Downloading image from " + uri)
-    request.head(uri, function (err, res, body) {
-        var imgPath = path.join(process.env.TEMP_DIR, filename)
-        request(uri).pipe(fs.createWriteStream(imgPath)).on('close', function () {
-            callback(imgPath)
-        });
-    });
 }

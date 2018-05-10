@@ -5,16 +5,17 @@
  * so the output data has a standard b1 format.
  */
 
-const qs = require("qs")
+const request = require("request");
+const fs = require("fs");
 const path = require("path")
 
-const sql   = require("./sql")
-const leo   = require("./leo")
+const sql = require("./sql")
+const leo = require("./leo")
 const normalize = require("./normalize")
 
 
-const b1    = require("./erp/b1")
-const byd   = require("./erp/byd")
+const b1 = require("./erp/b1")
+const byd = require("./erp/byd")
 
 
 module.exports = {
@@ -24,6 +25,14 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
+    SimilarItems: function (body, callback) {
+        return (SimilarItems(body, callback))
+    },
+
+    DownloadImage: function (uri, filename, callback) {
+        return DownloadImage(uri, filename, callback)
+    },
+
     RowToFile: function (row) {
         return (RowToFile(row))
     },
@@ -31,6 +40,11 @@ module.exports = {
         return (FileToRow(file))
     }
 }
+
+function SimilarItems(body, callback) {
+
+}
+
 
 function GetItems(query, callback) {
     byd.GetItems(query, function (error, itemsByD) {
@@ -69,18 +83,29 @@ function GetSalesOrders(query, callback) {
     })
 }
 
-function RowToFile(row){
-    return row.origin +process.env.FILE_SEP +row.productid+path.extname(row.image)
+
+function DownloadImage(uri, filename, callback) {
+    console.log("Downloading image from " + uri)
+    request.head(uri, function (err, res, body) {
+        var imgPath = path.join(process.env.TEMP_DIR, filename)
+        request(uri).pipe(fs.createWriteStream(imgPath)).on('close', function () {
+            callback(imgPath)
+        });
+    });
 }
 
-function FileToRow(file){
-    var row ={}
+function RowToFile(row) {
+    return row.origin + process.env.FILE_SEP + row.productid + path.extname(row.image)
+}
+
+function FileToRow(file) {
+    var row = {}
     var sep = process.env.FILE_SEP
     var ext = path.extname(file);
 
-    row.origin = file.substr(0,file.indexOf(sep))
-    file = file.substr(file.indexOf(sep)+sep.length,file.indexOf(ext))
-    row.productid = file.substr(0,file.indexOf(ext))
-    
+    row.origin = file.substr(0, file.indexOf(sep))
+    file = file.substr(file.indexOf(sep) + sep.length, file.indexOf(ext))
+    row.productid = file.substr(0, file.indexOf(ext))
+
     return row
 }
