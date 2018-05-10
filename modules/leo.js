@@ -77,6 +77,7 @@ function SimilatiryScoring(vectorsZip, numSimilars, callback) {
             callback(err, null)
         }
         else {
+            body = JSON.parse(body)
             console.log("Vector(s) extracted for " + body.predictions.length + " image(s)")
             callback(null, body);
 

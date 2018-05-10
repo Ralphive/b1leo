@@ -54,7 +54,7 @@ function SimilarItems(body, callback) {
             if (error) {
                 console.error(error)
                 output.message = "Can't Extract vector for" + imgPath + " - " + error;
-                callback(error, output)
+                return callback(error, output)
             }
 
             console.log("Loading Vector Database")
@@ -62,7 +62,7 @@ function SimilarItems(body, callback) {
                 if (error) {
                     console.error(error)
                     output.message = "Can't retrive vector database " + error;
-                    callback(error, output)
+                    return callback(error, output)
                 }
 
                 console.log("Creating Zip with vector library")
@@ -70,7 +70,7 @@ function SimilarItems(body, callback) {
                     if (error) {
                         console.error(error)
                         output.message = "Cant Create library ZIP" + error;
-                        callback(error, output)
+                        return callback(error, output)
                     }
 
                     var numSimilar = null;
@@ -78,20 +78,25 @@ function SimilarItems(body, callback) {
                         numSimilar = body.similarItems
                     }
 
-                    leo.SimilatiryScoring(zipFile, numSimilar, function (error, scoring) {
+                    console.log("Calling Leonardo Similarity Scoring")
+                    leo.SimilatiryScoring(zipFile, numSimilar, function (error, similars) {
                         if (error) {
                             console.error(error)
                             output.message = "Cant retrieve SimilatiryScoring - " + error;
                             return callback(error, output)
                         }
-                            output.message = "Vector extracted for" + imgPath
-                            callback(null, output)
+                        MostSimilarItems(imgPath, similars, callback)
                     })
                 })
             })
         })
     })
 }
+
+function MostSimilarItems(base, similars, callback){
+    
+}
+
 
 function CreateSimilarityZip(library, similar, callback) {
     // Create e zip file of vectors to be used by the Similarity scoring service 
@@ -130,7 +135,7 @@ function CreateSimilarityZip(library, similar, callback) {
     //Add vector to be compared (Similar) to the Zip
     var buff = Buffer.from(JSON.stringify(similar.predictions[0].feature_vector), "utf8");
     var fileName = similar.predictions[0].name
-    fileName = fileName.substr(0, fileName.indexOf('.')) + '.txt'
+    fileName +=  '.txt'
     archive.append(buff, { name: fileName });
 
 
@@ -138,7 +143,7 @@ function CreateSimilarityZip(library, similar, callback) {
     for (key in library) {
         buff = Buffer.from(library[key].imgvector, "utf8");
         fileName = RowToFile(library[key])
-        fileName = fileName.substr(0, fileName.indexOf('.')) + '.txt'
+        fileName +=  '.txt'
         archive.append(buff, { name: fileName });
     }
     // finalize the archive (ie we are done appending files but streams have to finish yet) 
