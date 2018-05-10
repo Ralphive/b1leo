@@ -47,8 +47,24 @@ function SimilarItems(body, callback) {
     var output = {}
     console.log("Dowloading image from: " + body.url)
     DownloadImage(body.url, uuid.v4() + path.extname(body.url), function (imgPath) {
-        output.message = "Image downloaded on "+imgPath
-        callback(null,output)
+
+        console.log("Extracting Vector")
+        leo.extractVectors(imgPath, function (error, vector) {
+            if (error) {
+                console.error(error)
+                output.message = "Can't Extract vector for" + imgPath + " - " + error;
+                callback(error, output)
+            }
+
+            console.log("Loading Vector Database")
+            sql.Select(function (error, result) {
+                if (error) {
+                    console.error(error)
+                    output.message = "Can't retrive vector database " + error;
+                    callback(error, output)
+                }
+            })
+        })
     })
 }
 
@@ -59,34 +75,13 @@ function getSimilatiryScoring(vectors, callback) {
     var zipFile = uuid.v4() + '.zip';
 
     // create a file to stream archive data to the zip
-    var output = fs.createWriteStream(path.join(dbDir, zipFile));
+    var output = fs.createWriteStream(path.join(process.env.TEMP_DIR, zipFile));
     var archive = archiver('zip', { zlib: { level: 9 } }); // Sets the compression level. 
 
     // listen for all archive data to be written 
     output.on('close', function () {
-
-        var options = {
-            url: 'https://sandbox.api.sap.com/ml/similarityscoring/inference_sync',
-            headers: {
-                'APIKey': process.env.LEO_API_KEY,
-                'Accept': 'application/json',
-            },
-            formData: {
-                files: fs.createReadStream(path.join(dbDir, zipFile)),
-                options: "{\"numSimilarVectors\":3}"
-            }
-        }
-
-        request.post(options, function (err, res, body) {
-            if (res.statusCode != 200) {
-                callback(null, JSON.parse(body), res.statusMessage)
-            }
-            else {
-                callback(fileName, JSON.parse(body), null);
-
-            }
-        });
-
+        console.log("Zip Created - " + zipFile)
+        console.log("Time to call leonardo")
     });
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors) 
