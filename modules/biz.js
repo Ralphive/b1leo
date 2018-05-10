@@ -94,7 +94,25 @@ function SimilarItems(body, callback) {
 }
 
 function MostSimilarItems(base, similars, callback){
-    
+    var resp = {};
+
+    for (var i = 0; i < similars.predictions.length; i++) {
+        var curr_id = similars.predictions[i].id
+        curr_id =  curr_id.substr(0, curr_id.indexOf(path.extname(curr_id)))   
+
+        if (base.indexOf(curr_id) > 0) {
+            resp = similars.predictions[i].similarVectors
+            for (var j = 0; j < resp.length; j++) {
+                var fileName = resp[j].id
+                var score = resp[j].score
+                fileName = fileName.substr(0, fileName.indexOf(path.extname(fileName)))
+                resp[j] = FileToRow(fileName)
+                resp[j].score = score;
+            }
+            callback(null, resp);
+            break;
+        }
+    }
 }
 
 
