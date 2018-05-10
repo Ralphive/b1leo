@@ -9,6 +9,7 @@ const request = require("request");
 const fs = require("fs");
 const path = require("path")
 const uuid = require('uuid');
+const archiver = require("archiver")
 
 const sql = require("./sql")
 const leo = require("./leo")
@@ -48,7 +49,7 @@ function SimilarItems(body, callback) {
     console.log("Dowloading image from: " + body.url)
     DownloadImage(body.url, uuid.v4() + path.extname(body.url), function (imgPath) {
 
-        console.log("Extracting Vector")
+        console.log("Extracting Vector for " + imgPath)
         leo.extractVectors(imgPath, function (error, vector) {
             if (error) {
                 console.error(error)
@@ -63,13 +64,19 @@ function SimilarItems(body, callback) {
                     output.message = "Can't retrive vector database " + error;
                     callback(error, output)
                 }
+
+                console.log("Creating Zip with vector Library")
+                CreateSimilarityZip(result, vector, function (error, zipFile) {
+                    output.message = "Vector extracted for" + imgPath
+                    callback(null, output)
+                })
             })
         })
     })
 }
 
-function getSimilatiryScoring(vectors, callback) {
-    vectors = JSON.parse(vectors);
+function CreateSimilarityZip(library, similar, callback) {
+    // vectors = JSON.parse(vectors);
 
     // Create e zip file of vectors to be used by the Similarity scoring service 
     var zipFile = uuid.v4() + '.zip';
@@ -102,18 +109,22 @@ function getSimilatiryScoring(vectors, callback) {
     // pipe archive data to the file 
     archive.pipe(output);
 
-    var buff = Buffer.from(JSON.stringify(vectors.predictions[0].feature_vector), "utf8");
-    var fileName = vectors.predictions[0].name
+
+    //Add vector to be compared (Similar) to the Zip
+    var buff = Buffer.from(JSON.stringify(similar.predictions[0].feature_vector), "utf8");
+    var fileName = similar.predictions[0].name
     fileName = fileName.substr(0, fileName.indexOf('.')) + '.txt'
     archive.append(buff, { name: fileName });
 
-    fs.readdirSync(process.env.VECTOR_DIR).forEach(file => {
-        // append txt vector files from stream to the zip 
-        if (file.indexOf('.txt') !== -1) {
-            archive.append(fs.createReadStream(path.join(process.env.VECTOR_DIR, file)), { name: file });
-        }
-    })
 
+    //Add Vector library to the same zip
+    //fs.readdirSync(process.env.VECTOR_DIR).forEach(file => {
+    for (key in library) {
+        buff = Buffer.from(library[key].imgvector, "utf8");
+        fileName = RowToFile(library[key])
+        fileName = fileName.substr(0, fileName.indexOf('.')) + '.txt'
+        archive.append(buff, { name: fileName });
+    }
     // finalize the archive (ie we are done appending files but streams have to finish yet) 
     archive.finalize();
 
