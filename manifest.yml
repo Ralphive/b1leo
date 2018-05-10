@@ -1,15 +1,11 @@
 applications:
-- name: smbmkt
-  memory: 128m
+- name: b1leo
+  memory: 64m
   instances: 1
 buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
 env:
-    "B1_SLPATH_ENV": "/b1s/v1"
-    "B1_SLPORT_ENV": "50001"
-    "B1_COMP_ENV": "SBODEMOUS"
-    "B1_USER_ENV": "manager"
-    "B1_PASS_ENV": "1234"
-    "B1_DEFAULT_BP": "C99998"
-    "BYD_PORT": ""
-    "BYD_PATH": "/sap/byd/odata/cust/v1"
-    "BYD_DEFAULT_BP": "CP100110"
+    B1_SLPORT_ENV: 50001
+    B1_SLPATH_ENV: "/b1s/v1/"
+    B1_USER_ENV: "manager"
+    B1_PASS_ENV: "1234"
+    B1_COMP_ENV: "SBODEMOUS"
