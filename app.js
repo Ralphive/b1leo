@@ -35,7 +35,7 @@ redisClient.on('connect', function () {
 /* Configure PostgreSQL */
 credentials = null;
 if (vcap) {
-    credentials = { connectionString: vcap_services.postgresql[0].credentials.uri }
+    credentials = { connectionString: vcap.postgresql[0].credentials.uri }
     console.log("Postgree credentials found in VCAP")
 };
 var pgClient = new pg.Client(credentials)
@@ -88,6 +88,13 @@ app.get('/SalesOrders', function (req, res) {
     })
 });
 
+app.get('/SelectDB', function (req, res) {
+    sql.Select(function (error, response) {
+        res.setHeader('Content-Type', 'application/json')
+        res.status(200)
+        res.send(response)
+    })
+});
 app.post('/Initialize', function (req, res) {
     console.log("POST REQUEST: Initialize System")
     start.Initialize();
@@ -95,6 +102,8 @@ app.post('/Initialize', function (req, res) {
         message: "executing"
     };
     res.setHeader('Content-Type', 'application/json')
+    res.send(output)
+
 });
 
 app.post('/SimilarItems', function (req, res) {

@@ -13,3 +13,6 @@ env:
     "BYD_PORT": ""
     "BYD_PATH": "/sap/byd/odata/cust/v1"
     "BYD_DEFAULT_BP": "CP100110"
+    "TEMP_DIR": "files/tmp"
+    "VECTOR_DIR": "files/vectors"
+    "FILE_SEP": "-_-_"

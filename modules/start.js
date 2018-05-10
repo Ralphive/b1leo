@@ -90,7 +90,9 @@ function RetrieveImages(origin, callback) {
             console.log(rows.length + " items found to retrieve images from " + origin)
             for (i in rows) {
                 biz.DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
+                    console.log(imgPath + " Downloaded!" )
                     leo.extractVectors(imgPath, function (error, vector) {
+                        console.log("Received Vector for " +vector.predictions[0].name)
                         var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
                         rowToUpdate.imgvector = vector.predictions[0].feature_vector
                         sql.UpdateVector(rowToUpdate, function (err, result) {

@@ -16,10 +16,11 @@ var request = require('request') // HTTP Client
 var fs = require('fs')
 var LeoServer = process.env.LEO_SERVER || "https://sandbox.api.sap.com/ml"
 
-function extractVectors(file, callback) {
+function extractVectors(file, callback) { 
     // More info on
     // https://help.sap.com/viewer/product/SAP_LEONARDO_MACHINE_LEARNING_FOUNDATION/1.0/en-US
 
+    console.log("LEO RECEIVED: "+file);
 
     var options = {
         url: 'https://sandbox.api.sap.com/ml/featureextraction/inference_sync',
@@ -45,6 +46,7 @@ function extractVectors(file, callback) {
         else {
             body = JSON.parse(body)
             console.log("Vector(s) extracted for " + body.predictions.length + " image(s)")
+            console.log("LEO Vector(s) extracted for " + body.predictions[0].name)
             callback(null, body);
 
         }
