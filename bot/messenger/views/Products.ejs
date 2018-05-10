@@ -1,0 +1,174 @@
+<html>
+
+<head>
+  <title>My Shoppping Cart</title>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <style>
+    .glyphicon {
+    font-size: 60px;
+    }
+
+    .badge-notify {
+      background: red;
+      position: relative;
+      top: -20px;
+      right: 10px;
+      font-size: 20px;
+    }
+
+    .my-cart-icon-affix {
+      position: fixed;
+      z-index: 999;
+    }
+  </style>
+</head>
+
+<body class="container" id="body">
+
+    <div class="page-header">
+        <h1><strong>Products</strong>
+          <div style="float: right; cursor: pointer;">
+            <span class="glyphicon glyphicon-shopping-cart my-cart-icon"><span class="badge badge-notify my-cart-badge"></span></span>
+          </div>
+        </h1>
+      </div>
+
+  <!-- <button type="addNewProduct" name="addNewProduct" id="addNewProduct">Add New Product</button> -->
+
+  <!--div class="row" id="SelectedProduct">
+    <div class="col-md-3 text-center">
+      <img src="https://r.r10s.jp/com/global/en/img/gtop/shoes/Category-1.jpg" width="150px" height="150px">
+      <h4> A10000</h4>
+      <h5>High hill Blacm</h5>
+      <h5>Price: $20 In stock: 100</h5>
+      <button class="btn btn-danger my-cart-btn" data-id="1" data-name="product 1" data-summary="summary 1" data-price="10" data-quantity="1"
+        data-image="https://r.r10s.jp/com/global/en/img/gtop/shoes/Category-1.jpg">Add to Cart</button>
+        <a href="#" class="btn btn-info">Reviews</a>
+    </div>
+  </div-->
+
+  <!-- <div class="row" id="SimilarProductLabel">
+    <p class="text-left"><h3>Similar Products:</h3></p>
+  </div> -->
+
+  <!--Similar Products or Recommended Products-->
+  
+  <!-- <div id="SimilarProducts" class="row">
+      <div class="col-md-3 text-center">
+        <img src="https://riverisland.scene7.com/is/image/RiverIsland/703250_back?wid=1200" width="150px" height="150px">
+        <h4> A20000 - $20<h4>
+        <button class="btn btn-danger my-cart-btn" data-id="2" data-name="product 2" data-summary="summary 2" data-price="20" data-quantity="1"
+          data-image="https://riverisland.scene7.com/is/image/RiverIsland/703250_back?wid=1200">Add to Cart</button>
+        <a href="#" class="btn btn-info">Reviews</a>
+      </div>
+  </div> -->
+
+  <script src="./js/jquery-2.2.4.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+  <script src="./js/jquery.mycart.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+
+      var goToCartIcon = function ($addTocartBtn) {
+        var $cartIcon = $(".my-cart-icon");
+        var $image = $('<img width="50px" height="50px" src="' + $addTocartBtn.data("image") + '"/>').css({
+          "position": "fixed",
+          "z-index": "999"
+        });
+        $addTocartBtn.prepend($image);
+        var position = $cartIcon.position();
+        $image.animate({
+          top: position.top,
+          left: position.left
+        }, 500, "linear", function () {
+          $image.remove();
+        });
+      }
+
+      $('.my-cart-btn').myCart({
+        currencySymbol: '$',
+        classCartIcon: 'my-cart-icon',
+        classCartBadge: 'my-cart-badge',
+        classProductQuantity: 'my-product-quantity',
+        classProductRemove: 'my-product-remove',
+        classCheckoutCart: 'my-cart-checkout',
+        affixCartIcon: true,
+        showCheckoutModal: true,
+        numberOfDecimals: 2,
+        //cartItems: cartItems,
+        clickOnAddToCart: function ($addTocart) {
+          goToCartIcon($addTocart);
+
+        },
+        afterAddOnCart: function (products, totalPrice, totalQuantity) {
+          console.log("afterAddOnCart", products, totalPrice, totalQuantity);
+          //localStorage.CartItems = JSON.stringify(products);
+        },
+        clickOnCartIcon: function ($cartIcon, products, totalPrice, totalQuantity) {
+          console.log("cart icon clicked", $cartIcon, products, totalPrice, totalQuantity);
+        },
+        checkoutCart: function (products, totalPrice, totalQuantity) {
+          var checkoutString = "Total Amount: " + totalPrice + "\nTotal Quantity: " + totalQuantity;
+          checkoutString += "\n\n id \t name \t summary \t price \t quantity";
+          $.each(products, function () {
+            checkoutString += ("\n " + this.id + " \t " + this.name + " \t " + this.summary + " \t " +
+              this.price + " \t " + this.quantity);
+          });
+          alert(checkoutString)
+          console.log("checking out", products, totalPrice, totalQuantity);
+        },
+        getDiscountPrice: function (products, totalPrice, totalQuantity) {
+          console.log("calculating discount", products, totalPrice, totalQuantity);
+          return totalPrice * 0.95;
+        }
+      });
+      
+      let selectedProduct = <%- JSON.stringify(selectedProduct); %>;
+      if (selectedProduct && selectedProduct.ItemCode) {
+        $('#body').append(
+          `<div class="row" id="SelectedProduct">
+            <div class="col-xs-6 col-md-3 text-center">
+              <img src="${selectedProduct.ImageUrl}" width="300px" height="300px">
+            </div>
+            <div class="col-xs-6 col-md-3 text-center">
+              <h2>${selectedProduct.ItemCode}</h2>
+              <h2>${selectedProduct.ItemDescription}</h2>
+              <h2>Price: ${selectedProduct.UnitPrice}${selectedProduct.Currency} In stock: ${selectedProduct.InStock}</h2>
+              <button class="btn btn-default btn-danger my-cart-btn btn-lg" data-id="${selectedProduct.ItemCode}" data-name="${selectedProduct.ItemCode}" data-summary="${selectedProduct.ItemDescription}" data-price="${selectedProduct.UnitPrice}" data-quantity="1"
+              data-image="${selectedProduct.ImageUrl}">Add to Cart</button>
+              <a href="#" class="btn btn-info btn-lg">Reviews</a>
+            </div>
+          </div>`);
+      }
+
+      let similarProducts = <%- JSON.stringify(similarProducts); %>;
+      if (selectedProduct && selectedProduct.ItemCode && similarProducts && similarProducts.length > 0) {
+        $('#body').append(
+          `<div class="row" id="SimilarProductLabel">
+              <p class="text-left"><h1><strong>Similar Products:</strong></h1></p>
+          </div>`);
+      }
+
+      if (similarProducts && similarProducts.length > 0) {
+        $('#body').append(
+          `<div id="SimilarProducts" class="row">
+          </div>`);
+      }
+            
+      similarProducts.forEach(product => {
+        $('#SimilarProducts').append(`<div class="col-xs-12 col-md-3 text-center">
+      <img src="${product.ImageUrl}" width="300px" height="300px">
+      <h2>${product.ItemCode}</h2>
+      <h2>${product.ItemDescription}</h2>
+      <h2>Price: ${product.UnitPrice}${product.Currency} In stock: ${product.InStock}</h2>
+      <button class="btn btn-danger my-cart-btn btn-lg" data-id="${product.ItemCode}" data-name="${product.ItemCode}" data-summary="${product.ItemDescription}" data-price="${product.UnitPrice}" data-quantity="1"
+        data-image="${product.ImageUrl}">Add to Cart</button>
+        <a href="#" class="btn btn-info btn-lg">Reviews</a>
+    </div>`)
+      });
+    });
+  </script>
+
+</body>
+
+</html>
