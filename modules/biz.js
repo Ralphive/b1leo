@@ -65,10 +65,28 @@ function SimilarItems(body, callback) {
                     callback(error, output)
                 }
 
-                console.log("Creating Zip with vector Library")
+                console.log("Creating Zip with vector library")
                 CreateSimilarityZip(result, vector, function (error, zipFile) {
-                    output.message = "Vector extracted for" + imgPath
-                    callback(null, output)
+                    if (error) {
+                        console.error(error)
+                        output.message = "Cant Create library ZIP" + error;
+                        callback(error, output)
+                    }
+
+                    var numSimilar = null;
+                    if (body.hasOwnProperty("similarItems")) {
+                        numSimilar = body.similarItems
+                    }
+
+                    leo.SimilatiryScoring(zipFile, numSimilar, function (error, scoring) {
+                        if (error) {
+                            console.error(error)
+                            output.message = "Cant retrieve SimilatiryScoring - " + error;
+                            return callback(error, output)
+                        }
+                            output.message = "Vector extracted for" + imgPath
+                            callback(null, output)
+                    })
                 })
             })
         })
@@ -76,19 +94,18 @@ function SimilarItems(body, callback) {
 }
 
 function CreateSimilarityZip(library, similar, callback) {
-    // vectors = JSON.parse(vectors);
-
     // Create e zip file of vectors to be used by the Similarity scoring service 
-    var zipFile = uuid.v4() + '.zip';
+    var zipFile = path.join(process.env.VECTOR_DIR, uuid.v4() + '.zip');
 
     // create a file to stream archive data to the zip
-    var output = fs.createWriteStream(path.join(process.env.TEMP_DIR, zipFile));
+    var output = fs.createWriteStream(zipFile);
     var archive = archiver('zip', { zlib: { level: 9 } }); // Sets the compression level. 
 
     // listen for all archive data to be written 
     output.on('close', function () {
         console.log("Zip Created - " + zipFile)
-        console.log("Time to call leonardo")
+        console.log("Time to call Leonardo")
+        callback(null, zipFile)
     });
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors) 
@@ -97,13 +114,13 @@ function CreateSimilarityZip(library, similar, callback) {
             // log warning 
         } else {
             // throw error 
-            throw err;
+            callback(err)
         }
     });
 
     // good practice to catch this error explicitly 
     archive.on('error', function (err) {
-        throw err;
+        callback(err)
     });
 
     // pipe archive data to the file 
@@ -118,7 +135,6 @@ function CreateSimilarityZip(library, similar, callback) {
 
 
     //Add Vector library to the same zip
-    //fs.readdirSync(process.env.VECTOR_DIR).forEach(file => {
     for (key in library) {
         buff = Buffer.from(library[key].imgvector, "utf8");
         fileName = RowToFile(library[key])
@@ -127,7 +143,6 @@ function CreateSimilarityZip(library, similar, callback) {
     }
     // finalize the archive (ie we are done appending files but streams have to finish yet) 
     archive.finalize();
-
 }
 
 
