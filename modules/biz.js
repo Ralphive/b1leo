@@ -1,67 +1,70 @@
-/* Biz Logic Functions */
+/**
+ * Biz Logic functions 
+ * this module is a "Middleware" to talk with multiple backend systems
+ * it also normalizes and combine the different data structures from B1 and ByD
+ * so the output data has a standard b1 format.
+ */
+
+const qs = require("qs")
+const path = require("path")
+
+const sql   = require("./sql")
+const leo   = require("./leo")
+const normalize = require("./normalize")
+
+
+const b1    = require("./erp/b1")
+const byd   = require("./erp/byd")
+
 module.exports = {
-    MessagePriority: function (classification) {
-        return (MessagePriority(classification));
+    GetItems: function (query, callback) {
+        return (GetItems(query, callback))
     },
-    MessageDetails: function (classification) {
-        return (MessageDetails(classification));
+    GetSalesOrders: function (options, callback) {
+        return (GetSalesOrders(options, callback))
     },
-    RequireMessage: function (priority) {
-        return (RequireMessage(priority));
+    FormatFileName: function (row) {
+        return (FormatFileName(row))
     },
-
-    FormatMessage: function (activity) {
-        return (FormatMessage(activity));
-    }
-
 }
 
-function MessagePriority(classification) {
-    /* Set activity priority based on Leonardo Classification */
-    if (classification == "complaint")
-        return "pr_High";
-    return "pr_Normal";
-}
-
-function MessageDetails(classification) {
-    /* Set activity details based on Leonardo Classification */
-    var details = "";
-    if (classification == "complaint")
-        details = "URGENT ";
-    details += classification.toUpperCase() + " from customer";
-    return details;
-}
-
-function RequireMessage(priority) {
-    /* Priorities of activities which requires a Message to be dispatched */
-    if (priority == "pr_High")
-        return true;
-    return false;
-}
-
-function FormatMessage(activity) {
-    return ({
-        MessageDataColumns: [
-            {
-                ColumnName: "Activity",
-                Link: "tYES",
-                MessageDataLines: [
-                    {
-                        Object: "33", // Activities
-                        ObjectKey: activity.ActivityCode,
-                        Value: "Activity #" + activity.ActivityCode,
-                    }
-                ]
+function GetItems(query, callback) {
+    byd.GetItems(query, function (error, itemsByD) {
+        if (error) {
+            itemsByD = {};
+            itemsByD.error = error;
+        }
+        b1.GetItems(query, function (error, itemsB1) {
+            if (error) {
+                itemsB1 = {};
+                itemsB1.error = error;
             }
-        ],
-        RecipientCollection: [
-            {
-                SendInternal: "tYES",
-                UserCode: process.env.B1_USER_ENV
-            }
-        ],
-        Subject: activity.Details,
-        Text:  activity.Details,
-    });
 
+            var output = {
+                b1: { values: itemsB1.error || itemsB1.value },
+                byd: { values: itemsByD.error || itemsByD.d.results }
+            }
+
+            if (itemsB1.hasOwnProperty("odata.nextLink")) {
+                output.b1["odata.nextLink"] = itemsB1["odata.nextLink"];
+            }
+            callback(null, normalize.Items(output))
+        })
+    })
+}
+
+function GetSalesOrders(query, callback) {
+    byd.GetSalesOrders(query, function (error, itemsByD) {
+        b1.GetOrders(query, function (error, itemsB1) {
+            var output = {
+                b1: itemsB1.value,
+                byd: itemsByD.d.results
+            }
+            callback(null, normalize.SalesOrders(output))
+        })
+    })
+}
+
+function FormatFileName(row){
+    return row.origin + "__-"+row.productid+path.extname(row.image)
 }

@@ -1,0 +1,24 @@
+{
+  "name": "smb_assistant_bot",
+  "version": "1.0.0",
+  "description": "SAP SMB Market Place Assistant Bot on Facebook Messenger",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/B1SA/smbmkt.git"
+  },
+  "author": "SAP SE",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "ejs": "^2.5.7",
+    "express": "^4.13.4",
+    "request": "^2.72.0"
+  },
+  "engines": {
+    "node": "^6.12.0"
+  }
+}
