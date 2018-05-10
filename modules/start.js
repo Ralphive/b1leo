@@ -24,14 +24,20 @@ const normalize = require("./normalize")
 function Initialize() {
     var erps = ['b1', 'byd']
 
-    for (key in erps) {
-        loadErpItems(erps[key], null, function (origin) {
-            console.log(origin + " Items Loaded")
-            RetrieveImages(origin, function (text) {
-                console.log("DB Vectorized")
-            })
-        });
-    }
+    sql.Initialize(function (error) {
+        if (!error) {
+            for (key in erps) {
+                loadErpItems(erps[key], null, function (origin) {
+                    console.log(origin + " Items Loaded")
+                    RetrieveImages(origin, function (text) {
+                        console.log("DB Vectorized")
+                    })
+                });
+            }
+        }else{
+            console.error("Can't Create table for app initialization");
+        }
+    })
 }
 
 function loadErpItems(origin, query, callback) {
@@ -76,28 +82,33 @@ function InsertItemVectorDB(data) {
 }
 
 function RetrieveImages(origin, callback) {
-    sql.SelectErpItems(origin, function (err, result) {
+    sql.SelectErpItems(origin, function (err, rows) {
         if (err) {
             console.log("Can't select items to retrieve images from " + origin)
             callback(err)
         } {
-            console.log(result.length + " items found to retrieve images from " + origin)
-            DownloadItemImages(result)
+            console.log(rows.length + " items found to retrieve images from " + origin)
+            for (i in rows) {
+                DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
+                    leo.extractVectors(imgPath, function (error, vector) {
+                        var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
+                        rowToUpdate.imgvector = vector.predictions[0].feature_vector
+                        sql.UpdateVector(rowToUpdate, function (err, result) {
+                            console.log("Table Updated")
+                        })
+                    })
+                })
+            }
         }
     })
-}
-
-function DownloadItemImages(rows) {
-    for (i in rows) {
-        DownloadImage(rows[i].image, biz.FormatFileName(rows[i]), function () {
-            console.log('file downloaded');
-        })
-    }
 }
 
 function DownloadImage(uri, filename, callback) {
     console.log("Downloading image from " + uri)
     request.head(uri, function (err, res, body) {
-        request(uri).pipe(fs.createWriteStream(path.join(process.env.TEMP_DIR, filename))).on('close', callback);
+        var imgPath = path.join(process.env.TEMP_DIR, filename)
+        request(uri).pipe(fs.createWriteStream(imgPath)).on('close', function () {
+            callback(imgPath)
+        });
     });
 }

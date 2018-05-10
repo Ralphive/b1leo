@@ -15,8 +15,8 @@ module.exports = {
     Insert: function (data, callback) {
         return (Insert(data, callback));
     },
-    Update: function (item, callback) {
-        return (Update(item, callback));
+    UpdateVector: function (data, callback) {
+        return (UpdateVector(data, callback));
     },
     setClient: function (inClient) { pgClient = inClient; }
 
@@ -26,7 +26,7 @@ function Initialize(callback) {
     console.log('Initializing PostgreSQL database')
 
     var query = 'CREATE TABLE IF NOT EXISTS '
-        + 'items (productID varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector decimal array,'
+        + 'items (productID varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector text,'
         + 'PRIMARY KEY (productID, origin))'
 
     if (pgClient) {
@@ -79,22 +79,27 @@ function Insert(data, callback) {
     pgClient.query(query, [data.productID, data.origin, data.image, data.imgvector], function (err, result) {
         if (err) {
             console.error(err)
-            if (typeof callback === "function") { callbakc(err) }
+            if (typeof callback === "function") { callback(err) }
         } else {
-            if (typeof callback === "function") { callbakc(null, result) }
+            if (typeof callback === "function") { callback(null, result) }
         }
     });
 }
 
-function Update(data, callback) {
-    console.log('PG Updating Table data ' + JSON.stringify(item))
+function UpdateVector(data, callback) {
+    console.log('PG Updating Vector Table for ' + data.origin + ' item ' + data.productid)
 
-    var query = 'UPDATE items SET integrated = true WHERE productID = $1 and origin = $2';
-    pgClient.query(query, [data.productID, data.origin], function (err, result) {
+    var pgvector = data.imgvector;
+    pgvector ="["+pgvector.toString()+"]" 
+
+    var query = 'UPDATE items SET imgvector = $3 WHERE productid = $1 and origin = $2';
+    
+    pgClient.query(query, [data.productid, data.origin, pgvector], function (err, result) {
         if (err) {
-            callback(err)
+            console.error(err)
+            if (typeof callback === "function") { callback(err) }
         } else {
-            callback(null, result)
+            if (typeof callback === "function") { callback(null, result) }
         }
     });
 }

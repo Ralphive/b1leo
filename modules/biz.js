@@ -16,6 +16,7 @@ const normalize = require("./normalize")
 const b1    = require("./erp/b1")
 const byd   = require("./erp/byd")
 
+
 module.exports = {
     GetItems: function (query, callback) {
         return (GetItems(query, callback))
@@ -23,9 +24,12 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
-    FormatFileName: function (row) {
-        return (FormatFileName(row))
+    RowToFile: function (row) {
+        return (RowToFile(row))
     },
+    FileToRow: function (file) {
+        return (FileToRow(file))
+    }
 }
 
 function GetItems(query, callback) {
@@ -65,6 +69,18 @@ function GetSalesOrders(query, callback) {
     })
 }
 
-function FormatFileName(row){
-    return row.origin + "__-"+row.productid+path.extname(row.image)
+function RowToFile(row){
+    return row.origin +process.env.FILE_SEP +row.productid+path.extname(row.image)
+}
+
+function FileToRow(file){
+    var row ={}
+    var sep = process.env.FILE_SEP
+    var ext = path.extname(file);
+
+    row.origin = file.substr(0,file.indexOf(sep))
+    file = file.substr(file.indexOf(sep)+sep.length,file.indexOf(ext))
+    row.productid = file.substr(0,file.indexOf(ext))
+    
+    return row
 }

@@ -1,6 +1,6 @@
 module.exports = {
-    VectorizeDB: function (origin, callback) {
-        return VectorizeDB(origin, callback)
+    extractVectors: function (file, callback) {
+        return (extractVectors(file, callback))
     },
     Classify: function (text, callback) {
         return (Classify(text, callback));
@@ -9,10 +9,43 @@ module.exports = {
 
 var request = require('request') // HTTP Client
 var fs = require('fs')
-var path = require('path') 
-
-var sql = require('./sql')
 var LeoServer = process.env.LEO_SERVER || "https://sandbox.api.sap.com/ml"
+
+function extractVectors(file, callback) {
+    // More info on
+    // https://help.sap.com/viewer/product/SAP_LEONARDO_MACHINE_LEARNING_FOUNDATION/1.0/en-US
+    
+
+    var options = {
+        url: 'https://sandbox.api.sap.com/ml/featureextraction/inference_sync',
+        headers: {
+            'APIKey': process.env.LEO_API_KEY,
+            'Accept': 'application/json'
+        },
+        formData: {
+            files: fs.createReadStream(file)
+        }
+    }
+
+    request.post(options, function (err, res, body) {
+        if (err || res.statusCode != 200) {
+            console.error("LEO - Can't extract vector from "+file)
+            if (err){
+                console.error(err)
+            }else{
+                console.error("Status Code - " + response.statusCode + " - " + response.status_message)
+            }
+            callback(err,null)
+        }
+        else {
+            body = JSON.parse(body)
+            console.log("Vector(s) extracted for "+ body.predictions.length + " image(s)")
+            callback(null,body);
+
+        }
+    });
+}
+
 
 
 function Classify(text, callback) {
