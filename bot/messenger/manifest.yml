@@ -1,0 +1,5 @@
+---
+applications:
+- name: SAP_SMBAssistantBot
+  memory: 256m
+  instances: 1
