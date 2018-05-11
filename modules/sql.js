@@ -9,6 +9,9 @@ module.exports = {
     Select: function (callback) {
         return (Select(callback));
     },
+    SelectImages: function (callback) {
+        return (SelectImages(callback));
+    },
     SelectErpItems: function (origin, callback) {
         return (SelectErpItems(origin, callback));
     },
@@ -56,6 +59,17 @@ function Select(callback) {
 function SelectErpItems(origin, callback) {
     var query = 'SELECT * FROM items where origin = $1'
     pgClient.query(query, [origin], function (err, result) {
+        if (err) {
+            callback(err)
+        } else {
+            callback(null, result.rows)
+        }
+    });
+}
+
+function SelectImages(callback) {
+    var query = 'SELECT * FROM items where imgvector IS NOT null'
+    pgClient.query(query, function (err, result) {
         if (err) {
             callback(err)
         } else {

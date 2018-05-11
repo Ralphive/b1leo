@@ -67,7 +67,7 @@ function SimilarItems(body, callback) {
             }
 
             console.log("Loading Vector Database")
-            sql.Select(function (error, result) {
+            sql.SelectImages(function (error, result) {
                 if (error) {
                     console.error(error)
                     output.message = "Can't retrive vector database " + error;
