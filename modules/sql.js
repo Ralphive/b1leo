@@ -26,8 +26,8 @@ function Initialize(callback) {
     console.log('Initializing PostgreSQL database')
 
     var query = 'CREATE TABLE IF NOT EXISTS '
-        + 'items (productID varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector text,'
-        + 'PRIMARY KEY (productID, origin))'
+        + 'items (productid varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector text,'
+        + 'PRIMARY KEY (productid, origin))'
 
     if (pgClient) {
         pgClient.query(query, function (err, result) {
@@ -69,14 +69,14 @@ function Insert(data, callback) {
         data.imgvector = null;
     }
 
-    console.log('PG Inserting Table data for ' + data.origin + ' item ' + data.productID)
+    console.log('PG Inserting Table data for ' + data.origin + ' item ' + data.productid)
 
-    var query = 'INSERT INTO items(productID,origin,image,imgvector) '
+    var query = 'INSERT INTO items(productid,origin,image,imgvector) '
         + 'VALUES($1, $2, $3, $4) '
-        + 'ON CONFLICT (productID,origin) DO UPDATE '
+        + 'ON CONFLICT (productid,origin) DO UPDATE '
         + 'SET image = $3'
 
-    pgClient.query(query, [data.productID, data.origin, data.image, data.imgvector], function (err, result) {
+    pgClient.query(query, [data.productid, data.origin, data.image, data.imgvector], function (err, result) {
         if (err) {
             console.error(err)
             if (typeof callback === "function") { callback(err) }
