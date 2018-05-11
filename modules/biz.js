@@ -116,7 +116,13 @@ let formatSimilarResponse = function(response){
         var filter = {};
         var SimilarHash = uuid.v1();
     
-        
+        /* Test */ 
+        response.push({origin: "byd", productid: "P100101", score: 0.02})
+        response.push({origin: "byd", productid: "P100109", score: 0.02})
+        response.push({origin: "byd", productid: "P100110", score: 0.02})
+        /* Test */ 
+
+
         //Stores Item Similarity Score in Cache to be retrieved Later
         for (key in response) {
             if (fResp[response[key].origin] == null) {

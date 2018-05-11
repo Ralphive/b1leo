@@ -97,6 +97,11 @@ function GetItems(query, callback) {
     var options = ByDHeader
     var select = "" //"InternalID,Description,BaseMeasureUnitCode"
 
+    if(query.hasOwnProperty("$filter")){
+        //To be replaced by Normalize.ItemQuery()
+       query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "InternalID")
+   }
+    
     options.url = ByDServer + model_items
     options.qs = odata.formatQuery(query, select)
 
@@ -104,7 +109,7 @@ function GetItems(query, callback) {
         if (error) {
             callback(error);
         } else {
-            callback(null, body);
+            callback(null, formatByDResp(body));
         }
     });
 }
@@ -120,7 +125,7 @@ function GetSalesOrders(query, callback) {
         if (error) {
             callback(error);
         } else {
-            callback(null, body);
+            callback(null, formatByDResp(body));
         }
     });
 }
@@ -193,4 +198,18 @@ function setByDToken(csrfToken) {
     //Store the Session Timeout
     client.hset(hash_csrf, hash_csrf, csrfToken)
     console.log("Storing ByD CSRF token in cache")
+}
+
+function formatByDResp(output){
+    if (output.hasOwnProperty("d")){
+        output = output.d
+    }
+
+    if (output.hasOwnProperty("results")){
+        output.value = output.results
+        delete output.results;
+    }
+
+    return output
+
 }
