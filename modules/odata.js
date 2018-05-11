@@ -5,7 +5,23 @@ module.exports = {
     },
     formatResponse: function (body) {
         return (formatResponse(body))
-    }
+    },
+    qt: function (val) {
+        return (qt(val))
+    },
+    op: function (val) {
+        return (op(val))
+    },
+}
+
+function qt(val) {
+    //Quotes
+    return "%27" + val + "%27";
+}
+
+function op(op) {
+    //Operation
+    return "%20" + op + "%20";
 }
 
 function formatQuery(query, select) {
