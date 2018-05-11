@@ -1,8 +1,11 @@
 module.exports = {
-    Items: function (data, callback) {
+    Items: function (data) {
         return (NormalizeData("Items", data))
     },
-    SalesOrders: function (data, callback) {
+    ItemsQuery: function (query) {
+        return (NormalizeQuery("Items", data))
+    },
+    SalesOrders: function (data) {
         return (NormalizeData("SalesOrders", data))
     }
 }
@@ -11,9 +14,8 @@ const path = require('path')
 const fs = require('fs')
 
 function NormalizeData(dataType, data) {
-
+    
     console.log("Starting data normalization for " + dataType)
-
     var normData = {}
     for (property in data) {
         var formatPath = path.join(__dirname, 'schemas', property, dataType + ".json")
@@ -26,6 +28,27 @@ function NormalizeData(dataType, data) {
             var format = JSON.parse(fs.readFileSync(formatPath, 'utf8'));
             normData[property].values = Normalize(data[property].values, format)
             console.log("Data normalized")
+        }
+    }
+    return normData
+}
+
+function NormalizeQuery(dataType, data) {
+    
+    console.log("Starting Query normalization for " + dataType)
+    var normData = {}
+    for (property in data) {
+        var formatPath = path.join(__dirname, 'schemas', property, dataType + ".json")
+        console.log("Reading normalization schema for " + property + " from " + formatPath);
+        
+        normData[property] = data[property]
+        if (!fs.existsSync(formatPath)) {
+            // If there is no schema, don't normalize
+            console.error("No normalization schema found for " + path.join('schemas', property, dataType))
+        } else {
+            var format = JSON.parse(fs.readFileSync(formatPath, 'utf8'));
+            
+            /** TO implement query nomalization here */
         }
     }
     return normData
