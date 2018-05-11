@@ -97,11 +97,16 @@ function GetItems(query, callback) {
     var options = ByDHeader
     var select = "" //"InternalID,Description,BaseMeasureUnitCode"
 
-    if(query.hasOwnProperty("$filter")){
+    if (query && query.hasOwnProperty("$filter")) {
         //To be replaced by Normalize.ItemQuery()
-       query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "InternalID")
-   }
-    
+        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "InternalID")
+    }else{
+        if(!query){query = [];}
+    }
+
+    query["$expand"] = "MaterialTextCollection"
+
+
     options.url = ByDServer + model_items
     options.qs = odata.formatQuery(query, select)
 
@@ -200,12 +205,12 @@ function setByDToken(csrfToken) {
     console.log("Storing ByD CSRF token in cache")
 }
 
-function formatByDResp(output){
-    if (output.hasOwnProperty("d")){
+function formatByDResp(output) {
+    if (output.hasOwnProperty("d")) {
         output = output.d
     }
 
-    if (output.hasOwnProperty("results")){
+    if (output.hasOwnProperty("results")) {
         output.value = output.results
         delete output.results;
     }

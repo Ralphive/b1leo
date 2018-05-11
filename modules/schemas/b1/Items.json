@@ -1,12 +1,8 @@
 {
-    "ItemCode": "productid",
-    "ItemName": "name",
-    "QuantityOnStock": "inventoryLevel",
-    "User_Text": "image",
-    "ItemPrices": [
-        {
-            "Price": "price",
-            "Currency": "priceCurrency"
-        }
-    ]
+    "productId": "ItemCode",
+    "name": "ItemName",
+    "inventoryLevel": "QuantityOnStock",
+    "image": "User_Text",
+    "price": "ItemPrices[0].Price",
+    "priceCurrency": "ItemPrices[0].Currency"
 }

@@ -70,7 +70,7 @@ function GetItems(query, callback) {
     options.method = "GET"
     
     
-    if(query.hasOwnProperty("$filter")){
+    if(query && query.hasOwnProperty("$filter")){
          //To be replaced by Normalize.ItemQuery()
         query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "ItemCode")
     }

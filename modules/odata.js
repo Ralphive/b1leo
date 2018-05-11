@@ -43,6 +43,10 @@ function formatQuery(query, select) {
         qs["$filter"] = query["$filter"]
     }
 
+    if (query && query.hasOwnProperty("$expand")) {
+        qs["$expand"] = query["$expand"]
+    }
+
     if(select){
         qs["$select"] = select;
     }

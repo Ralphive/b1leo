@@ -281,12 +281,12 @@ let mergeItemAndCache = function (itemList,hash){
 
 
 function GetItems(query, callback) {
-    byd.GetItems(query, function (error, itemsByD) {
+    byd.GetItems({}, function (error, itemsByD) {
         if (error) {
             itemsByD = {};
             itemsByD.error = error;
         }
-        b1.GetItems(query, function (error, itemsB1) {
+        b1.GetItems({}, function (error, itemsB1) {
             if (error) {
                 itemsB1 = {};
                 itemsB1.error = error;
@@ -294,7 +294,7 @@ function GetItems(query, callback) {
 
             var output = {
                 b1: { values: itemsB1.error || itemsB1.value },
-                byd: { values: itemsByD.error || itemsByD.d.results }
+                byd: { values: itemsByD.error || itemsByD.value }
             }
 
             if (itemsB1.hasOwnProperty("odata.nextLink")) {
