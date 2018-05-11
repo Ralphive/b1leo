@@ -1,0 +1,1 @@
+###This is a temp folder used mainly to feature extraction vectors in zips. Files in here are used once and then can be deleted.
