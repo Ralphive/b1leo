@@ -1,5 +1,5 @@
 {
-    "productId": "InternalID",
+    "productid": "InternalID",
     "name": "Description",
     "inventoryLevel": "QuantityOnStock",
     "image": "$substring(MaterialTextCollection[0].Text,0,4)='http'?MaterialTextCollection[0].Text:''"

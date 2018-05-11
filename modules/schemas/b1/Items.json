@@ -1,5 +1,5 @@
 {
-    "productId": "ItemCode",
+    "productid": "ItemCode",
     "name": "ItemName",
     "inventoryLevel": "QuantityOnStock",
     "image": "User_Text",

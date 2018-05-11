@@ -70,12 +70,18 @@ function loadErpItems(origin, query, callback) {
 }
 
 function InsertItemVectorDB(data) {
+    var chosen = []
     for (property in data) {
         var values = data[property].values
         for (var i = 0; i < values.length; i++) {
-            if (!values[i].image || values[i].image == "") { continue }
-
-            values[i].origin = property;
+            if (!values[i].image || values[i].image == "" || path.extname(values[i].image) == "") { 
+                continue 
+            }else 
+            {
+                values[i].origin = property;
+                chosen.push(values[i])
+            }
+            console.log("To insert Item "+values[i].productid +" from "+property +" on database." )
             sql.Insert(values[i])
         }
     }
