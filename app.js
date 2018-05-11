@@ -8,8 +8,6 @@ const redis = require("redis")
 const pg = require("pg")
 
 /* Load Local Modules */
-const b1 = require('./modules/erp/b1');
-const byd = require('./modules/erp/byd');
 const biz = require('./modules/biz');
 const sql = require('./modules/sql');
 const start = require('./modules/start')
@@ -28,8 +26,7 @@ if (process.env.VCAP_SERVICES) {
 var redisClient = redis.createClient(credentials);
 redisClient.on('connect', function () {
     console.log("Connected to Redis")
-    b1.setClient(redisClient)
-    byd.setClient(redisClient)
+    biz.setClient(redisClient)
 });
 
 /* Configure PostgreSQL */

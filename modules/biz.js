@@ -10,15 +10,18 @@ const fs = require("fs");
 const path = require("path")
 const uuid = require('uuid');
 const archiver = require("archiver")
+const redis = require("redis")
 
 const sql = require("./sql")
 const leo = require("./leo")
 const normalize = require("./normalize")
+const odata = require("./odata")
 
 
 const b1 = require("./erp/b1")
 const byd = require("./erp/byd")
 
+var client; // Redis Client
 
 module.exports = {
     GetItems: function (query, callback) {
@@ -40,7 +43,13 @@ module.exports = {
     },
     FileToRow: function (file) {
         return (FileToRow(file))
+    },
+    setClient: function (inClient) {
+        client = inClient;
+        b1.setClient(inClient)
+        byd.setClient(inClient)
     }
+
 }
 
 function SimilarItems(body, callback) {
@@ -85,7 +94,15 @@ function SimilarItems(body, callback) {
                             output.message = "Cant retrieve SimilatiryScoring - " + error;
                             return callback(error, output)
                         }
-                        MostSimilarItems(imgPath, similars, callback)
+
+                        console.log("Ranking Similarity Response")
+                        MostSimilarItems(imgPath, similars, function (SimilarResponse) {
+
+                            console.log("Formating Similarity Response and retrieve ERP Data")
+                            formatSimilarResponse(SimilarResponse).then(function(finalData){
+                                callback(null,finalData)
+                            })
+                        })
                     })
                 })
             })
@@ -93,12 +110,57 @@ function SimilarItems(body, callback) {
     })
 }
 
-function MostSimilarItems(base, similars, callback){
+let formatSimilarResponse = function(response){
+    return new Promise(function(resolve,reject){
+        var fResp = {}
+        var filter = {};
+        var SimilarHash = uuid.v1();
+    
+        
+        //Stores Item Similarity Score in Cache to be retrieved Later
+        for (key in response) {
+            if (fResp[response[key].origin] == null) {
+                fResp[response[key].origin] = []
+                filter[response[key].origin] = "productid" + odata.op("eq") + odata.qt(response[key].productid)
+            }
+            client.hset(SimilarHash, response[key].origin + response[key].productid, response[key].score) //Store scoring in Redis
+            filter[response[key].origin] += odata.op("or") + "productid" + odata.op("eq") + odata.qt(response[key].productid)
+        }
+        
+        var call = 0;
+        
+        //Get ERP data for the similar Items (Price, Qty, Name and etc..)
+        for (key in filter) {
+            var re = GetErpItems(key, { $filter: filter[key] }).then(function (items) {
+                fResp[Object.keys(items)] = items[Object.keys(items)].values;
+                call++;
+    
+                if (call == Object.keys(filter).length) {
+                    //Retrieve Score for each item
+                    mergeItemAndCache(fResp,SimilarHash).then(function(data){
+                        //Able to retrieve score from cache
+                        resolve(data)
+                    }).catch(function () {
+                        //Can't get score from cache
+                        resolve(fResp)
+                    })
+                }
+            })
+        }  
+    })
+}
+
+function MostSimilarItems(base, similars, callback) {
+    
+    // SAP Leonardo Similarity Scoring provides a N x N comparision
+    // This function retrieves only the relevant similarity result for
+    // a base vector(the file provided as input)
+    
     var resp = {};
 
     for (var i = 0; i < similars.predictions.length; i++) {
         var curr_id = similars.predictions[i].id
-        curr_id =  curr_id.substr(0, curr_id.indexOf(path.extname(curr_id)))   
+        curr_id = curr_id.substr(0, curr_id.indexOf(path.extname(curr_id)))
 
         if (base.indexOf(curr_id) > 0) {
             resp = similars.predictions[i].similarVectors
@@ -109,7 +171,7 @@ function MostSimilarItems(base, similars, callback){
                 resp[j] = FileToRow(fileName)
                 resp[j].score = score;
             }
-            callback(null, resp);
+            callback(resp);
             break;
         }
     }
@@ -153,7 +215,7 @@ function CreateSimilarityZip(library, similar, callback) {
     //Add vector to be compared (Similar) to the Zip
     var buff = Buffer.from(JSON.stringify(similar.predictions[0].feature_vector), "utf8");
     var fileName = similar.predictions[0].name
-    fileName +=  '.txt'
+    fileName += '.txt'
     archive.append(buff, { name: fileName });
 
 
@@ -161,11 +223,54 @@ function CreateSimilarityZip(library, similar, callback) {
     for (key in library) {
         buff = Buffer.from(library[key].imgvector, "utf8");
         fileName = RowToFile(library[key])
-        fileName +=  '.txt'
+        fileName += '.txt'
         archive.append(buff, { name: fileName });
     }
     // finalize the archive (ie we are done appending files but streams have to finish yet) 
     archive.finalize();
+}
+
+let GetErpItems = function (origin, query) {
+    return new Promise(function (resolve, reject) {
+
+        var erp = eval(origin);
+
+        erp.GetItems(query, function (error, items) {
+            if (error) {
+                items = {};
+                items.error = error;
+            }
+            var output = {};
+            output[origin] = { values: items.error || items.value }
+
+            if (items.hasOwnProperty("odata.nextLink")) {
+                output[origin]["odata.nextLink"] = items["odata.nextLink"];
+            }
+
+            resolve(normalize.Items(output))
+        })
+    })
+}
+
+let mergeItemAndCache = function (itemList,hash){
+    return new Promise(function (resolve, reject){
+        
+        client.hgetall(hash, function (err, replies) {
+            
+            if (!err){
+                    console.log(replies + " scores in cache");
+
+                for (erp in itemList){
+                    for(item in itemList[erp]){
+                        itemList[erp][item].score = replies[erp+itemList[erp][item].productid]
+                    }
+                }
+                resolve(itemList);
+            }else{
+                reject(itemList)
+            }
+        });
+    })
 }
 
 

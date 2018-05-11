@@ -68,6 +68,14 @@ function GetItems(query, callback) {
     var select = "ItemCode,ItemName,ItemPrices,SalesUnit,QuantityOnStock,User_Text,Picture"
     options.url = SLServer + "/Items"
     options.method = "GET"
+    
+    
+    if(query.hasOwnProperty("$filter")){
+         //To be replaced by Normalize.ItemQuery()
+        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "ItemCode")
+    }
+    
+    
     options.qs = odata.formatQuery(query,select)
 
     ServiceLayerRequest(options, function (error, response, body) {

@@ -30,6 +30,7 @@
   "homepage": "https://github.com/B1SA/smbmkt#readme",
   "dependencies": {
     "archiver": "^2.1.1",
+    "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "moment": "^2.22.1",

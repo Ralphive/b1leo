@@ -16,12 +16,14 @@ module.exports = {
 
 function qt(val) {
     //Quotes
-    return "%27" + val + "%27";
+    return "'" + val + "'";
+    //return "%27" + val + "%27";
 }
 
-function op(op) {
+function op(val) {
     //Operation
-    return "%20" + op + "%20";
+    return " " + val + " ";
+    //return "%20" + val + "%20";
 }
 
 function formatQuery(query, select) {
