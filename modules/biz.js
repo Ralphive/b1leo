@@ -47,6 +47,11 @@ module.exports = {
     FileToRow: function (file) {
         return (FileToRow(file))
     },
+
+    CleanDirectory: function (directory) {
+        return CleanDirectory(directory)
+    },
+
     setClient: function (inClient) {
         client = inClient;
         b1.setClient(inClient)
@@ -100,9 +105,12 @@ function SimilarItems(body, callback) {
 
                         console.log("Ranking Similarity Response")
                         MostSimilarItems(imgPath, similars, function (SimilarResponse) {
-
                             console.log("Formating Similarity Response and retrieve ERP Data")
                             formatSimilarResponse(SimilarResponse).then(function (finalData) {
+                                
+                                //Erase all files from temp directories
+                                CleanDirectory(process.env.TEMP_DIR)
+                                CleanDirectory(process.env.VECTOR_DIR)
                                 callback(null, finalData)
                             })
                         })
@@ -356,6 +364,20 @@ function DownloadImage(uri, filename, callback) {
         request(uri).pipe(fs.createWriteStream(imgPath)).on('close', function () {
             callback(imgPath)
         });
+    });
+}
+
+function CleanDirectory(directory) {
+
+    console.log("Cleaning directory - " + directory)
+    fs.readdir(directory, (err, files) => {
+        if (err) throw err;
+
+        for (const file of files) {
+            fs.unlink(path.join(directory, file), err => {
+                if (err) throw err;
+            });
+        }
     });
 }
 

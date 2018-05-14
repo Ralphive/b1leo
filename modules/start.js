@@ -113,6 +113,10 @@ function RetrieveImages(callback) {
                                 sql.UpdateVector(rowToUpdate, function (err, result) {
                                     console.log("Table Updated")
                                 })
+                                if(vector == vectors.predictions.length-1){
+                                    biz.CleanDirectory(process.env.TEMP_DIR)
+                                    biz.CleanDirectory(process.env.VECTOR_DIR)
+                                }
                             }
                         } else {
                             console.error(error);
