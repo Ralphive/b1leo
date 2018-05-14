@@ -39,14 +39,15 @@ function extractVectors(file, callback) {
             if (err) {
                 console.error(err)
             } else {
-                console.error("Status Code - " + res.statusCode + " - " + res.statusMessage)
+                err = "Status Code - " + res.statusCode + " - " + res.statusMessage
+                console.error(err)
+                console.error(body)
             }
             callback(err, null)
         }
         else {
             body = JSON.parse(body)
             console.log("Vector(s) extracted for " + body.predictions.length + " image(s)")
-            console.log("LEO Vector(s) extracted for " + body.predictions[0].name)
             callback(null, body);
 
         }

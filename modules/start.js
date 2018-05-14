@@ -12,6 +12,9 @@ const qs = require("qs")
 const fs = require("fs")
 const path = require("path")
 const request = require("request")
+const isImage = require("is-image")
+const archiver = require("archiver")
+const uuid = require("uuid")
 
 const sql = require("./sql")
 const leo = require("./leo")
@@ -26,12 +29,17 @@ function Initialize() {
 
     sql.Initialize(function (error) {
         if (!error) {
+            var call = 1
             for (key in erps) {
                 loadErpItems(erps[key], null, function (origin) {
+                    call++;
                     console.log(origin + " Items Loaded")
-                    RetrieveImages(origin, function (text) {
-                        console.log("DB Vectorized")
-                    })
+                    if (call == erps.length) {
+                        console.log("Starting processing of Images")
+                        RetrieveImages(function (text) {
+                            console.log("DB Vectorized")
+                        })
+                    }
                 });
             }
         } else {
@@ -45,6 +53,8 @@ function loadErpItems(origin, query, callback) {
     if (query) {
         query = qs.parse(query);
     }
+
+    console.log("Getting data from " + origin)
 
     erp = eval(origin);
 
@@ -74,7 +84,7 @@ function InsertItemVectorDB(data) {
     for (property in data) {
         var values = data[property].values
         for (var i = 0; i < values.length; i++) {
-            if (!values[i].image || values[i].image == "" || path.extname(values[i].image) == "") {
+            if (!isImage(values[i].image)) {
                 continue
             } else {
                 values[i].origin = property;
@@ -86,28 +96,92 @@ function InsertItemVectorDB(data) {
     }
 }
 
-function RetrieveImages(origin, callback) {
-    sql.SelectErpItems(origin, function (err, rows) {
+function RetrieveImages(callback) {
+    sql.Select(function (err, rows) {
         if (err) {
-            console.log("Can't select items to retrieve images from " + origin)
-            callback(err)
+            console.error("Can't select items to retrieve images from " + origin)
         } {
-            console.log(rows.length + " items found to retrieve images from " + origin)
-            for (i in rows) {
-                biz.DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
-                    console.log(imgPath + " Downloaded!")
-                    leo.extractVectors(imgPath, function (error, vector) {
+            DowloadAllImages(rows)
+                .then(CreateFeatureExtractionZip)
+                .then(function (zipFile) {
+                    leo.extractVectors(zipFile, function (error, vectors) {
                         if (!error) {
-                            console.log("Received Vector for " + vector.predictions[0].name)
-                            var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
-                            rowToUpdate.imgvector = vector.predictions[0].feature_vector
-                            sql.UpdateVector(rowToUpdate, function (err, result) {
-                                console.log("Table Updated")
-                            })
+                            for (vector in vectors.predictions) {
+                                console.log("Received Vector for vector #" + vector + " - " + vectors.predictions[vector].name)
+                                var rowToUpdate = biz.FileToRow(vectors.predictions[vector].name)
+                                rowToUpdate.imgvector = vectors.predictions[vector].feature_vector
+                                sql.UpdateVector(rowToUpdate, function (err, result) {
+                                    console.log("Table Updated")
+                                })
+                            }
+                        } else {
+                            console.error(error);
                         }
                     })
                 })
-            }
         }
+    })
+}
+
+let DowloadAllImages = function (rows) {
+    return new Promise(function (resolve, reject) {
+        var downloaded = 0;;
+        for (i in rows) {
+            biz.DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
+                downloaded++
+                if (downloaded == rows.length) {
+                    console.log("All images downloaded!")
+                    resolve();
+                }
+            })
+        }
+    })
+}
+
+
+let CreateFeatureExtractionZip = function () {
+    return new Promise(function (resolve, reject) {
+
+        // Create e zip file of vectors to be used by the Similarity scoring service 
+        var zipFile = path.join(process.env.TEMP_DIR, uuid.v4() + '.zip');
+
+        // create a file to stream archive data to the zip
+        var output = fs.createWriteStream(zipFile);
+        var archive = archiver('zip', { zlib: { level: 9 } }); // Sets the compression level. 
+
+        // listen for all archive data to be written 
+        output.on('close', function () {
+            console.log("Extraction Feature Zip Created - " + zipFile)
+            console.log("Time to call Leonardo")
+            resolve(zipFile)
+        });
+
+        // good practice to catch warnings (ie stat failures and other non-blocking errors) 
+        archive.on('warning', function (err) {
+            if (err.code === 'ENOENT') {
+                // log warning 
+            } else {
+                // throw error 
+                reject(err)
+            }
+        });
+
+        // good practice to catch this error explicitly 
+        archive.on('error', function (err) {
+            reject(err)
+        });
+
+        // pipe archive data to the file 
+        archive.pipe(output);
+
+        fs.readdirSync(process.env.TEMP_DIR).forEach(file => {
+            if (isImage(file)) {
+                archive.append(fs.createReadStream(path.join(process.env.TEMP_DIR, file)), { name: file });
+                console.log(file + "Added to Extraction Feature Zip");
+            }
+        })
+
+        // finalize the archive (ie we are done appending files but streams have to finish yet) 
+        archive.finalize();
     })
 }
