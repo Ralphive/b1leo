@@ -9,6 +9,9 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
+    PostSalesOrder: function (body, callback) {
+        return (PostSalesOrder(body, callback))
+    },
     setClient: function (inClient) { client = inClient; }
 }
 
@@ -133,6 +136,12 @@ function GetSalesOrders(query, callback) {
             callback(null, formatByDResp(body));
         }
     });
+}
+
+function PostSalesOrder(body, callback) {
+   
+    callback(null, {messsage: "BYD Done"});
+
 }
 
 let Connect = function () {

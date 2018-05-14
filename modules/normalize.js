@@ -25,6 +25,7 @@ function NormalizeData(dataType, data) {
         if (!fs.existsSync(formatPath)) {
             // If there is no schema, don't normalize
             console.error("No normalization schema found for " + path.join('schemas', property, dataType))
+            normData = data;
         } else {
             var format = JSON.parse(fs.readFileSync(formatPath, 'utf8'));
             normData[property].values = Normalize(data[property].values, format)

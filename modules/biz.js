@@ -33,6 +33,9 @@ module.exports = {
     SimilarItems: function (body, callback) {
         return (SimilarItems(body, callback))
     },
+    CreateSalesOrder: function (body, callback) {
+        return (CreateSalesOrder(body, callback))
+    },
 
     DownloadImage: function (uri, filename, callback) {
         return DownloadImage(uri, filename, callback)
@@ -99,8 +102,8 @@ function SimilarItems(body, callback) {
                         MostSimilarItems(imgPath, similars, function (SimilarResponse) {
 
                             console.log("Formating Similarity Response and retrieve ERP Data")
-                            formatSimilarResponse(SimilarResponse).then(function(finalData){
-                                callback(null,finalData)
+                            formatSimilarResponse(SimilarResponse).then(function (finalData) {
+                                callback(null, finalData)
                             })
                         })
                     })
@@ -110,18 +113,11 @@ function SimilarItems(body, callback) {
     })
 }
 
-let formatSimilarResponse = function(response){
-    return new Promise(function(resolve,reject){
+let formatSimilarResponse = function (response) {
+    return new Promise(function (resolve, reject) {
         var fResp = {}
         var filter = {};
         var SimilarHash = uuid.v1();
-    
-        /* Test */ 
-        response.push({origin: "byd", productid: "P100101", score: 0.02})
-        response.push({origin: "byd", productid: "P100109", score: 0.02})
-        response.push({origin: "byd", productid: "P100110", score: 0.02})
-        /* Test */ 
-
 
         //Stores Item Similarity Score in Cache to be retrieved Later
         for (key in response) {
@@ -132,36 +128,36 @@ let formatSimilarResponse = function(response){
             client.hset(SimilarHash, response[key].origin + response[key].productid, response[key].score) //Store scoring in Redis
             filter[response[key].origin] += odata.op("or") + "productid" + odata.op("eq") + odata.qt(response[key].productid)
         }
-        
+
         var call = 0;
-        
+
         //Get ERP data for the similar Items (Price, Qty, Name and etc..)
         for (key in filter) {
             var re = GetErpItems(key, { $filter: filter[key] }).then(function (items) {
                 fResp[Object.keys(items)] = items[Object.keys(items)].values;
                 call++;
-    
+
                 if (call == Object.keys(filter).length) {
                     //Retrieve Score for each item
-                    mergeItemAndCache(fResp,SimilarHash).then(function(data){
+                    mergeItemAndCache(fResp, SimilarHash).then(function (data) {
                         //Able to retrieve score from cache
                         resolve(data)
                     }).catch(function () {
-                        //Can't get score from cache
+                        //Can't get score from cache, return Item without score
                         resolve(fResp)
                     })
                 }
             })
-        }  
+        }
     })
 }
 
 function MostSimilarItems(base, similars, callback) {
-    
+
     // SAP Leonardo Similarity Scoring provides a N x N comparision
     // This function retrieves only the relevant similarity result for
     // a base vector(the file provided as input)
-    
+
     var resp = {};
 
     for (var i = 0; i < similars.predictions.length; i++) {
@@ -181,6 +177,41 @@ function MostSimilarItems(base, similars, callback) {
             break;
         }
     }
+}
+
+function CreateSalesOrder(body, callback) {
+    /* Receives a body with all items from each erp */
+
+    var fResp = {};
+
+    call = 0;
+    for (key in body) {
+        var re = PostErpSalesOrder(key, body[key]).then(function (salesOrder) {
+            fResp[Object.keys(salesOrder)] = salesOrder[Object.keys(salesOrder)].values;
+            call++;
+            if (call == Object.keys(body).length) {
+                callback(fResp)
+            }
+        })
+    }
+
+}
+
+let PostErpSalesOrder = function (origin, body) {
+    return new Promise(function (resolve, reject) {
+        var erp = eval(origin);
+
+        erp.PostSalesOrder(body, function (error, salesOrder) {
+            if (error) {
+                salesOrder = {};
+                salesOrder.error = error;
+            }
+            var output = {};
+            output[origin] = { values: salesOrder.error || salesOrder }
+            resolve(normalize.SalesOrders(output))
+        })
+
+    })
 }
 
 
@@ -258,21 +289,21 @@ let GetErpItems = function (origin, query) {
     })
 }
 
-let mergeItemAndCache = function (itemList,hash){
-    return new Promise(function (resolve, reject){
-        
-        client.hgetall(hash, function (err, replies) {
-            
-            if (!err){
-                    console.log(replies + " scores in cache");
+let mergeItemAndCache = function (itemList, hash) {
+    return new Promise(function (resolve, reject) {
 
-                for (erp in itemList){
-                    for(item in itemList[erp]){
-                        itemList[erp][item].score = replies[erp+itemList[erp][item].productid]
+        client.hgetall(hash, function (err, replies) {
+
+            if (!err) {
+                console.log(replies + " scores in cache");
+
+                for (erp in itemList) {
+                    for (item in itemList[erp]) {
+                        itemList[erp][item].score = replies[erp + itemList[erp][item].productid]
                     }
                 }
                 resolve(itemList);
-            }else{
+            } else {
                 reject(itemList)
             }
         });

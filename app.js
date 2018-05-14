@@ -116,9 +116,18 @@ app.post('/SimilarItems', function (req, res) {
     console.log('GetSimilarItems')
 });
 
+app.post('/SalesOrders', function (req, res) {
+    console.log("REQUEST: Create Sales Order")
+   biz.CreateSalesOrder(req.body, function (response) {
+        res.setHeader('Content-Type', 'application/json')
+        res.status(201)
+        res.send(response)
+    })
+});
+
 
 var port = process.env.PORT || 30000
-app.listen(port, function () {
+app.listen(port, function () { 
     console.log('Example app listening on port ' + port);
 });
 

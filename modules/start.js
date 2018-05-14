@@ -34,7 +34,7 @@ function Initialize() {
                     })
                 });
             }
-        }else{
+        } else {
             console.error("Can't Create table for app initialization");
         }
     })
@@ -74,14 +74,13 @@ function InsertItemVectorDB(data) {
     for (property in data) {
         var values = data[property].values
         for (var i = 0; i < values.length; i++) {
-            if (!values[i].image || values[i].image == "" || path.extname(values[i].image) == "") { 
-                continue 
-            }else 
-            {
+            if (!values[i].image || values[i].image == "" || path.extname(values[i].image) == "") {
+                continue
+            } else {
                 values[i].origin = property;
                 chosen.push(values[i])
             }
-            console.log("To insert Item "+values[i].productid +" from "+property +" on database." )
+            console.log("To insert Item " + values[i].productid + " from " + property + " on database.")
             sql.Insert(values[i])
         }
     }
@@ -96,14 +95,16 @@ function RetrieveImages(origin, callback) {
             console.log(rows.length + " items found to retrieve images from " + origin)
             for (i in rows) {
                 biz.DownloadImage(rows[i].image, biz.RowToFile(rows[i]), function (imgPath) {
-                    console.log(imgPath + " Downloaded!" )
+                    console.log(imgPath + " Downloaded!")
                     leo.extractVectors(imgPath, function (error, vector) {
-                        console.log("Received Vector for " +vector.predictions[0].name)
-                        var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
-                        rowToUpdate.imgvector = vector.predictions[0].feature_vector
-                        sql.UpdateVector(rowToUpdate, function (err, result) {
-                            console.log("Table Updated")
-                        })
+                        if (!error) {
+                            console.log("Received Vector for " + vector.predictions[0].name)
+                            var rowToUpdate = biz.FileToRow(vector.predictions[0].name)
+                            rowToUpdate.imgvector = vector.predictions[0].feature_vector
+                            sql.UpdateVector(rowToUpdate, function (err, result) {
+                                console.log("Table Updated")
+                            })
+                        }
                     })
                 })
             }

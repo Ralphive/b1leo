@@ -11,6 +11,9 @@ module.exports = {
     GetOrders: function (options, callback) {
         return (GetOrders(options, callback))
     },
+    PostSalesOrder: function (body, callback) {
+        return (PostSalesOrder(body, callback))
+    },
     setClient: function (inClient) { client = inClient; }
 }
 const request = require('request')  // HTTP Client
@@ -72,7 +75,7 @@ function GetItems(query, callback) {
     
     if(query && query.hasOwnProperty("$filter")){
          //To be replaced by Normalize.ItemQuery()
-        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "ItemCode")
+        query["$filter"] = b1Normalize(query["$filter"])
     }
     
     
@@ -100,6 +103,33 @@ function GetOrders(query, callback) {
         if (!error && response.statusCode == 200) {
             body = odata.formatResponse(JSON.parse(body));
             callback(null, body);
+        } else {
+            callback(error);
+        }
+    });
+}
+
+function PostSalesOrder(body, callback) {
+    var options = {}
+
+    options.url = SLServer + "/Orders"
+    options.method = "POST"
+    options.body = {
+        "CardCode" : process.env.B1_DEFAULT_BP,
+        "DocDueDate" : moment().format('YYYY-MM-DD'),
+        "DocumentLines":[]
+    }
+    options.body.DocumentLines = JSON.parse(b1Normalize(JSON.stringify(body.lines)))
+
+    options.body = JSON.stringify(options.body);
+
+    ServiceLayerRequest(options, function (error, response, body) {
+        if (!error && response.statusCode == 201) {
+            body = odata.formatResponse(JSON.parse(body));
+            console.log("Sales order created: "+ body.DocEntry)
+            
+            callback(null, body);
+
         } else {
             callback(error);
         }
@@ -198,3 +228,9 @@ function updateSLSessionTimeout() {
     })
 }
 
+function b1Normalize(str){
+    // To be replaced by Normalize.js Functions in the future
+    str = str.replace(new RegExp('productid', 'g'), "ItemCode")
+    str = str.replace('lines', "DocumentLines")
+    return str
+}
