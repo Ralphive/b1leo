@@ -127,7 +127,16 @@ function PostSalesOrder(body, callback) {
         if (!error && response.statusCode == 201) {
             body = odata.formatResponse(JSON.parse(body));
             console.log("Sales order created: "+ body.DocEntry)
-            
+            /* Testing for no trash data generation */
+            options = {} 
+            options.url = SLServer + "/Orders("+body.DocEntry+")/Cancel"
+            options.method = "POST"
+            ServiceLayerRequest(options, function (err, res) {
+                if (res){
+                    console.log("Sales order cancelled")
+                }
+            })
+            /* Testing for no trash data generation */
             callback(null, body);
 
         } else {

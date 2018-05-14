@@ -341,7 +341,7 @@ function GetSalesOrders(query, callback) {
         b1.GetOrders(query, function (error, itemsB1) {
             var output = {
                 b1: itemsB1.value,
-                byd: itemsByD.d.results
+                byd: itemsByD.value
             }
             callback(null, normalize.SalesOrders(output))
         })
