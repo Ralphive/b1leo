@@ -172,7 +172,7 @@ let Connect = function () {
                 });
 
             } else {
-                console.error("Connection to Service Layer failed. \n" + error.message)
+                console.error("Connection to Service Layer failed. \n" + error)
                 reject(error, response);
             }
         });
