@@ -205,7 +205,7 @@ let Connect = function () {
 
         var options = {
             url: getByDserver() + model_sales,
-            method: "HEAD"
+            method: "GET"
         };
 
         ByDRequest(options, function (error, response, body) {

@@ -107,7 +107,7 @@ function SimilarItems(body, callback) {
                         MostSimilarItems(imgPath, similars, function (SimilarResponse) {
                             console.log("Formating Similarity Response and retrieve ERP Data")
                             formatSimilarResponse(SimilarResponse).then(function (finalData) {
-                                
+
                                 //Erase all files from temp directories
                                 CleanDirectory(process.env.TEMP_DIR)
                                 CleanDirectory(process.env.VECTOR_DIR)
@@ -345,12 +345,11 @@ function GetItems(query, callback) {
 }
 
 function GetSalesOrders(query, callback) {
-    byd.GetSalesOrders(query, function (error, itemsByD) {
-        b1.GetOrders(query, function (error, itemsB1) {
-            var output = {
-                b1: itemsB1.value,
-                byd: itemsByD.value
-            }
+    byd.GetSalesOrders(query, function (errByd, soByD) {
+        b1.GetOrders(query, function (errB1, soB1) {
+            var output = {};
+            output["b1"] = { values: errB1 || soB1.value}
+            output["byd"] = { values: errByd || soByD.value}
             callback(null, normalize.SalesOrders(output))
         })
     })
