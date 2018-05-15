@@ -215,6 +215,10 @@ let PostErpSalesOrder = function (origin, body) {
                 salesOrder.error = error;
             }
             var output = {};
+            if (salesOrder.hasOwnProperty("value")) {
+                salesOrder = salesOrder.value
+            }
+
             output[origin] = { values: salesOrder.error || salesOrder }
             resolve(normalize.SalesOrders(output))
         })
@@ -348,8 +352,8 @@ function GetSalesOrders(query, callback) {
     byd.GetSalesOrders(query, function (errByd, soByD) {
         b1.GetOrders(query, function (errB1, soB1) {
             var output = {};
-            output["b1"] = { values: errB1 || soB1.value}
-            output["byd"] = { values: errByd || soByD.value}
+            output["b1"] = { values: errB1 || soB1.value }
+            output["byd"] = { values: errByd || soByD.value }
             callback(null, normalize.SalesOrders(output))
         })
     })

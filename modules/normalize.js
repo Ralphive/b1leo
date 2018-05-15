@@ -63,11 +63,19 @@ function Normalize(input, format) {
 
     var data = [];
     var json;
+    var inputArr = []    
 
     if (typeof input == 'undefined') { return data };
 
-    for (var i = 0; i < input.length; i++) {
-        json = input[i];
+    if (input.length){
+        inputArr = input
+    }else{
+        inputArr.push(input)
+    }
+
+
+    for (var i = 0; i < inputArr.length; i++) {
+        json = inputArr[i];
         var item = {}
         for (var property in format) {
             if (Array.isArray(format[property])) {

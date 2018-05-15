@@ -125,7 +125,6 @@ function PostSalesOrder(body, callback) {
 
     ServiceLayerRequest(options, function (error, response, body) {
         if (!error && response.statusCode == 201) {
-            body = odata.formatResponse(JSON.parse(body));
             console.log("Sales order created: "+ body.DocEntry)
             /* Testing for no trash data generation */
             options = {} 
@@ -137,6 +136,7 @@ function PostSalesOrder(body, callback) {
                 }
             })
             /* Testing for no trash data generation */
+            body = odata.formatResponse(JSON.parse(body));
             callback(null, body);
 
         } else {
