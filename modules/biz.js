@@ -7,6 +7,7 @@
 
 const request = require("request");
 const fs = require("fs");
+const qs = require("qs")
 const path = require("path")
 const uuid = require('uuid');
 const archiver = require("archiver")
@@ -59,12 +60,25 @@ module.exports = {
     }
 
 }
-
 function SimilarItems(body, callback) {
 
     var output = {}
     console.log("Dowloading image from: " + body.url)
-    DownloadImage(body.url, uuid.v4() + path.extname(body.url), function (imgPath) {
+
+    //Handle images that requires parameters to be acessed
+    var imgRequest = {
+        method: "GET",
+        url: body.url,
+        qs: qs.parse(body.url)
+    }
+
+    var imgName = body.url;
+    if(imgName.indexOf("?")>0){
+        //There are parameters in the URL Request
+        imgName = imgName.substr(0,body.url.indexOf("?"))
+    }
+
+    DownloadImage(imgRequest, uuid.v4() + path.extname(imgName), function (imgPath) {
 
         console.log("Extracting Vector for " + imgPath)
         leo.extractVectors(imgPath, function (error, vector) {
