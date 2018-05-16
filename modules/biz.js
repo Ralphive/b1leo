@@ -141,6 +141,8 @@ let formatSimilarResponse = function (response) {
         var filter = {};
         var SimilarHash = uuid.v1();
 
+        console.log("Formatting Similarity Response")
+
         //Stores Item Similarity Score in Cache to be retrieved Later
         for (key in response) {
             if (fResp[response[key].origin] == null) {
@@ -155,16 +157,23 @@ let formatSimilarResponse = function (response) {
 
         //Get ERP data for the similar Items (Price, Qty, Name and etc..)
         for (key in filter) {
+            console.log("Getting ERP Items Data")
             var re = GetErpItems(key, { $filter: filter[key] }).then(function (items) {
                 fResp[Object.keys(items)] = items[Object.keys(items)].values;
                 call++;
 
                 if (call == Object.keys(filter).length) {
                     //Retrieve Score for each item
+                    console.log("Getting Similarity Score from Cache")
                     mergeItemAndCache(fResp, SimilarHash).then(function (data) {
                         //Able to retrieve score from cache
+                        console.log("Ranking Similar Items with ERP Data by Score")
+                        for (erp in data){
+                            data[erp].sort(compareScore)
+                        }   
                         resolve(data)
                     }).catch(function () {
+                        console.error("Can't retrieve Similarity Score from cache")
                         //Can't get score from cache, return Item without score
                         resolve(fResp)
                     })
@@ -414,4 +423,12 @@ function FileToRow(file) {
     row.productid = file.substr(0, file.indexOf(ext))
 
     return row
+}
+
+function compareScore(a, b) {
+    if (a.score < b.score)
+        return 1;
+    if (a.score > b.score)
+        return -1;
+    return 0;
 }

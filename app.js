@@ -105,6 +105,8 @@ app.post('/Initialize', function (req, res) {
 
 app.post('/SimilarItems', function (req, res) {
 
+    console.log("Finding similiar Items for: ")
+    console.log(req.body)
     biz.SimilarItems(req.body, function (err, resp) {
         if (err) {
             res.status(500).send(resp)
