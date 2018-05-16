@@ -1,9 +1,9 @@
 {
     "productid": "InternalID",
     "name": "Description",
-    "inventoryLevel": "10",
+    "inventoryLevel": "KCENDING_QUANTITY",
     "image": "$substring(MaterialTextCollection[0].Text,0,4)='http'?MaterialTextCollection[0].Text:''",
     "price": "2.5",
-    "priceCurrency": "USD" 
+    "priceCurrency": "'USD'" 
 }
 
