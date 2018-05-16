@@ -9,6 +9,9 @@ module.exports = {
     GetSalesOrders: function (options, callback) {
         return (GetSalesOrders(options, callback))
     },
+    GetItemPrice: function (options, callback) {
+        return (GetItemPrice(options, callback))
+    },
     PostSalesOrder: function (body, callback) {
         return (PostSalesOrder(body, callback))
     },
@@ -17,6 +20,7 @@ module.exports = {
 
 const request = require('request')  // HTTP Client
 const qs = require("qs")
+const sql = require("../sql")
 
 const moment = require('moment')    // Date Time manipulation
 const odata = require('../odata')
@@ -124,7 +128,7 @@ function GetItems(query, callback) {
         if (error) {
             callback(error);
         } else {
-            
+
             // Another request to retrieve the Item Quantities
             // ** I am not proud of this here ** 
             var optQty = {
@@ -135,26 +139,80 @@ function GetItems(query, callback) {
                 if (error) {
                     callback(null, formatByDResp(bodyItems));
                 } else {
-                    var Qtys = bodyQty.d.results
-                    var Items = bodyItems.d.results
 
-                    for (item in Items) {
-                        for (qty in Qtys) {
-                            if (Items[item].InternalID == Qtys[qty].CMATERIAL_UUID) {
-                                Items[item].KCENDING_QUANTITY = Qtys[qty].KCENDING_QUANTITY
+                    //And Now the ByD Item Prices Stored Previously
+                    sql.SelectErpItemsPrices("byd", function (erro, prices) {
+                        
+                        var Qtys = bodyQty.d.results
+                        var Items = bodyItems.d.results
+
+                        for (item in Items) {
+                            for (qty in Qtys) {
+                                if (Items[item].InternalID == Qtys[qty].CMATERIAL_UUID) {
+                                    Items[item].KCENDING_QUANTITY = Qtys[qty].KCENDING_QUANTITY
+                                }
+                            }
+
+                            for (price in prices){
+                                if (Items[item].InternalID == prices[price].productid) {
+                                    Items[item].price = prices[price].price
+                                    Items[item].pricecurrency = prices[price].currency
+                                }
+                            }
+
+                            if (Items[item].KCENDING_QUANTITY == null) { Items[item].KCENDING_QUANTITY = 0 }
+                            if (Items[item].price == null) { Items[item].price = null; Items[item].pricecurrency = null;  }
+
+                            if (item == (Items.length - 1)) {
+                                bodyItems.d.results = Items;
+                                callback(null, formatByDResp(bodyItems));
                             }
                         }
-                        if (Items[item].KCENDING_QUANTITY == null){Items[item].KCENDING_QUANTITY = 0}
-                        if (item == (Items.length - 1)) {
-                            bodyItems.d.results = Items;
-                            callback(null, formatByDResp(bodyItems));
-                        }
-                    }
 
+                    })
                 }
             })
         }
     });
+}
+
+function GetItemPrice(query, callback) {
+    var options = {};
+    var select = "" //"InternalID,Description,BaseMeasureUnitCode"
+
+    if (query && query.hasOwnProperty("$filter")) {
+        //To be replaced by Normalize.ItemQuery()
+        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "InternalID")
+    } else {
+        if (!query) { query = []; }
+    }
+
+    query["$expand"] = "MaterialTextCollection"
+
+
+    options.url = getByDserver() + model_items
+    options.method = "GET"
+    options.qs = odata.formatQuery(query, select)
+
+    var price = {
+        productid: query,
+        price: (Math.round((Math.random() * 10 / Math.random()) * 100) / 100),
+        currency: "USD"
+    }
+
+    callback(null, price)
+
+
+    /** Waiting for BYD Definition */
+    // ByDRequest(options, function (error, response, bodyItems) {
+    //     if (error) {
+    //         callback(error);
+    //     } else {
+
+    //         callback(null, formatByDResp(bodyItems));
+
+    //     }
+    // });
 }
 
 function GetSalesOrders(query, callback) {

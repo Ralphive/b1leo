@@ -121,6 +121,7 @@ function RetrieveImages(callback) {
                         } else {
                             console.error(error);
                         }
+                        biz.UpdateItemPrices()
                     })
                 })
         }

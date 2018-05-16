@@ -37,6 +37,9 @@ module.exports = {
     CreateSalesOrder: function (body, callback) {
         return (CreateSalesOrder(body, callback))
     },
+    UpdateItemPrices(){
+        return(UpdateItemPrices())
+    },
 
     DownloadImage: function (uri, filename, callback) {
         return DownloadImage(uri, filename, callback)
@@ -379,6 +382,25 @@ function GetSalesOrders(query, callback) {
             output["byd"] = { values: errByd || soByD.value }
             callback(null, normalize.SalesOrders(output))
         })
+    })
+}
+
+function UpdateItemPrices(){
+    sql.SelectErpItems("byd", function (error, result) {
+        for (item in result){
+            console.log("Getting prices for " + result[item].productid)
+            
+            byd.GetItemPrice(result[item].productid, function(err, price){
+                var row = {
+                    productid: price.productid,
+                    origin: "byd",
+                    price: price.price,
+                    currency: price.currency,
+                }
+                sql.InsertPrice(row)
+            })
+        }
+
     })
 }
 
