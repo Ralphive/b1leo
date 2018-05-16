@@ -1,7 +1,9 @@
 {
     "productid": "InternalID",
     "name": "Description",
-    "inventoryLevel": "QuantityOnStock",
-    "image": "$substring(MaterialTextCollection[0].Text,0,4)='http'?MaterialTextCollection[0].Text:''"
+    "inventoryLevel": "10",
+    "image": "$substring(MaterialTextCollection[0].Text,0,4)='http'?MaterialTextCollection[0].Text:''",
+    "price": "2.5",
+    "priceCurrency": "USD" 
 }
 
