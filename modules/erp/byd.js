@@ -16,6 +16,7 @@ module.exports = {
 }
 
 const request = require('request')  // HTTP Client
+const qs = require("qs")
 
 const moment = require('moment')    // Date Time manipulation
 const odata = require('../odata')
@@ -45,12 +46,12 @@ const ByDHeader = {
 function ByDRequest(options, callback) {
 
     getCookiesCache(options.method).then(function (cookies) {
-        if(options.headers == null){options.headers = []}
-        
+        if (options.headers == null) { options.headers = [] }
+
         options.headers["Cookie"] = cookies
 
         getTokenCache(options.method).then(function (csrfToken) {
-            
+
             options.headers["x-csrf-token"] = csrfToken
             options.headers["Accept"] = "application/json"
             options.headers["Content-Type"] = "application/json"
@@ -119,11 +120,39 @@ function GetItems(query, callback) {
     options.method = "GET"
     options.qs = odata.formatQuery(query, select)
 
-    ByDRequest(options, function (error, response, body) {
+    ByDRequest(options, function (error, response, bodyItems) {
         if (error) {
             callback(error);
         } else {
-            callback(null, formatByDResp(body));
+            
+            // Another request to retrieve the Item Quantities
+            // ** I am not proud of this here ** 
+            var optQty = {
+                url: process.env.BYD_SERVER + "/sap/byd/odata/scm_physicalinventory_analytics.svc/RPSCMINBU01_Q0001QueryResults",
+                qs: qs.parse("$format=json&$select=CMATERIAL_UUID,KCENDING_QUANTITY")
+            }
+            ByDRequest(optQty, function (error, response, bodyQty) {
+                if (error) {
+                    callback(null, formatByDResp(bodyItems));
+                } else {
+                    var Qtys = bodyQty.d.results
+                    var Items = bodyItems.d.results
+
+                    for (item in Items) {
+                        for (qty in Qtys) {
+                            if (Items[item].InternalID == Qtys[qty].CMATERIAL_UUID) {
+                                Items[item].KCENDING_QUANTITY = Qtys[qty].KCENDING_QUANTITY
+                            }
+                        }
+                        if (Items[item].KCENDING_QUANTITY == null){Items[item].KCENDING_QUANTITY = 0}
+                        if (item == (Items.length - 1)) {
+                            bodyItems.d.results = Items;
+                            callback(null, formatByDResp(bodyItems));
+                        }
+                    }
+
+                }
+            })
         }
     });
 }
@@ -161,13 +190,13 @@ function PostSalesOrder(body, callback) {
         }
     }
 
-//    opt.url = opt.url.substr(0,opt.url.indexOf("?"))
+    //    opt.url = opt.url.substr(0,opt.url.indexOf("?"))
 
 
 
     for (item in body.lines) {
         var item = {
-            "ID": String((item*1+1) * 10), //Lines in BYD are 10, 20 , 30...
+            "ID": String((item * 1 + 1) * 10), //Lines in BYD are 10, 20 , 30...
             "SalesOrderItemProduct": {
                 "ProductID": body.lines[item].productid
             },

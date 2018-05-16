@@ -73,9 +73,9 @@ function SimilarItems(body, callback) {
     }
 
     var imgName = body.url;
-    if(imgName.indexOf("?")>0){
+    if (imgName.indexOf("?") > 0) {
         //There are parameters in the URL Request
-        imgName = imgName.substr(0,body.url.indexOf("?"))
+        imgName = imgName.substr(0, body.url.indexOf("?"))
     }
 
     DownloadImage(imgRequest, uuid.v4() + path.extname(imgName), function (imgPath) {
@@ -391,9 +391,11 @@ function CleanDirectory(directory) {
         if (err) throw err;
 
         for (const file of files) {
-            fs.unlink(path.join(directory, file), err => {
-                if (err) throw err;
-            });
+            if (path.extname(file) != ".MD") {
+                fs.unlink(path.join(directory, file), err => {
+                    if (err) throw err;
+                });
+            }
         }
     });
 }
