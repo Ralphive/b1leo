@@ -60,6 +60,10 @@ app.use(function (req, res, next) {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//Static folder (to css and js front end files)
+app.use(express.static('public'));
+
+
 setInterval(biz.UpdateItemPrices,1.8e+6)
 
 /* Express API */
@@ -109,6 +113,7 @@ app.post('/SimilarItems', function (req, res) {
     console.log("Finding similiar Items for: ")
     console.log(req.body)
     biz.SimilarItems(req.body, function (err, resp) {
+        res.setHeader('Content-Type', 'application/json')
         if (err) {
             res.status(500).send(resp)
         } else {
