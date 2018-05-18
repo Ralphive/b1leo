@@ -37,8 +37,8 @@ module.exports = {
     CreateSalesOrder: function (body, callback) {
         return (CreateSalesOrder(body, callback))
     },
-    UpdateItemPrices(){
-        return(UpdateItemPrices())
+    UpdateItemPrices() {
+        return (UpdateItemPrices())
     },
 
     DownloadImage: function (uri, filename, callback) {
@@ -171,9 +171,9 @@ let formatSimilarResponse = function (response) {
                     mergeItemAndCache(fResp, SimilarHash).then(function (data) {
                         //Able to retrieve score from cache
                         console.log("Ranking Similar Items with ERP Data by Score")
-                        for (erp in data){
+                        for (erp in data) {
                             data[erp].sort(compareScore)
-                        }   
+                        }
                         resolve(data)
                     }).catch(function () {
                         console.error("Can't retrieve Similarity Score from cache")
@@ -385,22 +385,30 @@ function GetSalesOrders(query, callback) {
     })
 }
 
-function UpdateItemPrices(){
+function UpdateItemPrices() {
     sql.SelectErpItems("byd", function (error, result) {
-        for (item in result){
-            console.log("Getting prices for " + result[item].productid)
-            
-            byd.GetItemPrice(result[item].productid, function(err, price){
-                var row = {
-                    productid: price.productid,
-                    origin: "byd",
-                    price: price.price,
-                    currency: price.currency,
-                }
-                sql.InsertPrice(row)
-            })
+
+        var filter = filter = "productid" + odata.op("eq") + odata.qt(result[0].productid);
+        for (item in result) {
+            filter += odata.op("or") + "productid" + odata.op("eq") + odata.qt(result[item].productid);
         }
 
+        byd.GetItemPrice({ $filter: filter }, function (err, prices) {
+
+            if(!err){
+                for (key in prices.value) {
+                    var row = {
+                        productid: prices.value[key].CIPR_PRODUCT,
+                        origin: "byd",
+                        price: prices.value[key].KCZF8AB2100987110A811399E,
+                        currency: prices.value[key].RCITV_NET_AMT_RC
+                    }
+                    sql.InsertPrice(row)
+                }
+            }else{
+                console.error(err)
+            }
+        })
     })
 }
 

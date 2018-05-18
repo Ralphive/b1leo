@@ -4,6 +4,6 @@
     "inventoryLevel": "KCENDING_QUANTITY",
     "image": "$substring(MaterialTextCollection[0].Text,0,4)='http'?MaterialTextCollection[0].Text:''",
     "price": "price",
-    "priceCurrency": "priceCurrency" 
+    "priceCurrency": "pricecurrency" 
 }
 

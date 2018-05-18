@@ -55,11 +55,12 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
 //To Support body on post requests
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
+setInterval(biz.UpdateItemPrices,1.8e+6)
 
 /* Express API */
 // Root path to retrieve Index.html

@@ -59,22 +59,23 @@ function loadErpItems(origin, query, callback) {
     erp = eval(origin);
 
     erp.GetItems(query, function (error, items) {
+        var output = {} 
         if (error) {
-            items = {};
-            items.error = error;
-        }
-        var output = {};
-        output[origin] = { values: items.error || items.value }
-
-
-        //Update DB
-        InsertItemVectorDB(normalize.Items(output))
-
-        if (items.hasOwnProperty("odata.nextLink")) {
-            output[origin]["odata.nextLink"] = items["odata.nextLink"];
-            loadErpItems(origin, output[origin]["odata.nextLink"], callback);
-        } else {
+            output[origin] = { values: error }
             callback(origin)
+        } else {
+            output[origin] = { values: items.error || items.value }
+
+
+            //Update DB
+            InsertItemVectorDB(normalize.Items(output))
+
+            if (items.hasOwnProperty("odata.nextLink")) {
+                output[origin]["odata.nextLink"] = items["odata.nextLink"];
+                loadErpItems(origin, output[origin]["odata.nextLink"], callback);
+            } else {
+                callback(origin)
+            }
         }
     })
 }
@@ -113,7 +114,7 @@ function RetrieveImages(callback) {
                                 sql.UpdateVector(rowToUpdate, function (err, result) {
                                     console.log("Table Updated")
                                 })
-                                if(vector == vectors.predictions.length-1){
+                                if (vector == vectors.predictions.length - 1) {
                                     biz.CleanDirectory(process.env.TEMP_DIR)
                                     biz.CleanDirectory(process.env.VECTOR_DIR)
                                 }

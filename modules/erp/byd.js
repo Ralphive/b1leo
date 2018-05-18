@@ -129,8 +129,10 @@ function GetItems(query, callback) {
             callback(error);
         } else {
 
-            // Another request to retrieve the Item Quantities
-            // ** I am not proud of this here ** 
+            // Another request to retrieve the Item Quantities and prices
+            // that are not available in the Item Odata Service.
+
+            // ** \/ I am not proud of this \/ ** 
             var optQty = {
                 url: process.env.BYD_SERVER + "/sap/byd/odata/scm_physicalinventory_analytics.svc/RPSCMINBU01_Q0001QueryResults",
                 qs: qs.parse("$format=json&$select=CMATERIAL_UUID,KCENDING_QUANTITY")
@@ -142,7 +144,7 @@ function GetItems(query, callback) {
 
                     //And Now the ByD Item Prices Stored Previously
                     sql.SelectErpItemsPrices("byd", function (erro, prices) {
-                        
+
                         var Qtys = bodyQty.d.results
                         var Items = bodyItems.d.results
 
@@ -153,7 +155,7 @@ function GetItems(query, callback) {
                                 }
                             }
 
-                            for (price in prices){
+                            for (price in prices) {
                                 if (Items[item].InternalID == prices[price].productid) {
                                     Items[item].price = prices[price].price
                                     Items[item].pricecurrency = prices[price].currency
@@ -161,7 +163,7 @@ function GetItems(query, callback) {
                             }
 
                             if (Items[item].KCENDING_QUANTITY == null) { Items[item].KCENDING_QUANTITY = 0 }
-                            if (Items[item].price == null) { Items[item].price = null; Items[item].pricecurrency = null;  }
+                            if (Items[item].price == null) { Items[item].price = null; Items[item].pricecurrency = null; }
 
                             if (item == (Items.length - 1)) {
                                 bodyItems.d.results = Items;
@@ -172,47 +174,39 @@ function GetItems(query, callback) {
                     })
                 }
             })
+            // /\ ** I am not proud of this /\ ** 
+
         }
     });
 }
 
 function GetItemPrice(query, callback) {
     var options = {};
-    var select = "" //"InternalID,Description,BaseMeasureUnitCode"
 
     if (query && query.hasOwnProperty("$filter")) {
         //To be replaced by Normalize.ItemQuery()
-        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "InternalID")
+        query["$filter"] = query["$filter"].replace(new RegExp('productid', 'g'), "CIPR_PRODUCT")
     } else {
         if (!query) { query = []; }
     }
+    query["$select"] = "CIPR_PRODUCT,KCZF8AB2100987110A811399E,RCITV_NET_AMT_RC"
+    query["$format"] = "json"
 
-    query["$expand"] = "MaterialTextCollection"
-
-
-    options.url = getByDserver() + model_items
-    options.method = "GET"
-    options.qs = odata.formatQuery(query, select)
-
-    var price = {
-        productid: query,
-        price: (Math.round((Math.random() * 10 / Math.random()) * 100) / 100),
-        currency: "USD"
+    options = {
+        url: process.env.BYD_SERVER + "/sap/byd/odata/ana_businessanalytics_analytics.svc/RPZBB683E8960C6B776E12234QueryResults",
+        method: "GET",
+        qs: query
     }
 
-    callback(null, price)
+    ByDRequest(options, function (error, response, bodyItems) {
+        if (error) {
+            console.error(error)
+            callback(error);
+        } else {
+            callback(null, formatByDResp(bodyItems));
 
-
-    /** Waiting for BYD Definition */
-    // ByDRequest(options, function (error, response, bodyItems) {
-    //     if (error) {
-    //         callback(error);
-    //     } else {
-
-    //         callback(null, formatByDResp(bodyItems));
-
-    //     }
-    // });
+        }
+    });
 }
 
 function GetSalesOrders(query, callback) {
