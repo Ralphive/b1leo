@@ -135,7 +135,7 @@ function GetItems(query, callback) {
             // ** \/ I am not proud of this \/ ** 
             var optQty = {
                 url: process.env.BYD_SERVER + "/sap/byd/odata/ana_businessanalytics_analytics.svc/RPZ3AC654ED1CC343F1741612QueryResults",
-                qs: qs.parse("$format=json&$select=CMATERIAL_UUID,KCENDING_QUANTITY")
+                qs: qs.parse("$format=json&$select=CMATERIAL_UUID,KCENDING_QUANTITY&$top=100000")
             }
             ByDRequest(optQty, function (error, response, bodyQty) {
                 if (error) {
