@@ -1,6 +1,11 @@
-exports.B1ChatbotApiUrl = 'https://b1chatbotapi.cfapps.eu10.hana.ondemand.com/b1chatbot/api/v1';
-exports.ViewChartUrl = 'https://b1assistantmessengerbot.cfapps.eu10.hana.ondemand.com/web/viewChart?data=';
-exports.ViewProductUrl = 'https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com/web/Products?data=';
+exports.smbmkt_root_url = 'https://smbmkt.cfapps.eu10.hana.ondemand.com/';
+exports.smbmkt_similarity_endpoint = 'SimilarItems';
+//production url
+exports.smbmkt_bot_root_url = 'https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com'
+//debug url
+//exports.smbmkt_bot_root_url = 'https://39fcc97f.ngrok.io'
+exports.ViewProductUrl = `${exports.smbmkt_bot_root_url}/web/Products?data=`;
+exports.Decimal = 2;
 exports.FbMaxNoInList = 4;
 exports.EnableFbNlp = true;
 exports.NlpConfidenceThreshhold = 0.80;
@@ -36,7 +41,7 @@ exports.ElementTemplate = `{
     },
     "buttons": [
         {
-            "title": "Add to Cart",
+            "title": "View Detail",
             "type": "web_url",
             "url": "",
             "messenger_extensions": true,
@@ -66,22 +71,15 @@ exports.GenericTemplate = {
     }
 };
 
-exports.getLoginUrl = function (){
-    return `${exports.B1ChatbotApiUrl}/login`
-}
-
-exports.getQueryUrl = function (query){
-    return `${exports.B1ChatbotApiUrl}.1/message?query=${query}`;
-}
-
-exports.getViewChartUrl = function (encodedData) {
-    return `${exports.ViewChartUrl}${encodedData}`;
-}
-
 exports.getProductUrl = function(encodedData){
     return exports.getUrl(exports.ViewProductUrl, encodedData);
 }
 
 exports.getUrl = function (url,encodedData) {
     return `${url}${encodedData}`;
+}
+
+exports.getItemSimilarityUrl = function()
+{
+    return `${exports.smbmkt_root_url}${exports.smbmkt_similarity_endpoint}`;    
 }

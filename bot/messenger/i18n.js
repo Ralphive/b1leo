@@ -23,6 +23,8 @@ exports.HelpIntentReply = `At the present moment, I can help with below:
 2.Ask  with me about my age, gender, creator, b1 movie star etc. 
 3.Ask for help manual.`;
 exports.InvalidAttachmentTypeReply = "Invalid attachment type. Please upload an image of product(shoes).";
+exports.NoMatchedProductReply = "No matched product found on the market place.";
+exports.GenericAPIErrorReply = "An error has occurred on invoking api.";
 exports.GreetingIntent = 'Greeting';
 exports.ThankYouIntent = 'ThankYou';
 exports.GoodByeIntent = 'GoodBye';

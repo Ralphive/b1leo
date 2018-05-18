@@ -25,7 +25,10 @@ const
     i18n = require('./i18n'),
     config = require('./config'),
     fb_nlp = require('./fb_nlp'),
-    mockServer = require('./MockServer');
+    mockServer = require('./MockServer'),
+    util = require('./util'),
+    intentHelper = require('./IntentHelper'),
+    axios = require('axios');
     //b1BotProxy = require('./B1ChatbotProxy.js');
     
 console.log('app started');
@@ -70,31 +73,6 @@ app.post('/webhook', (req, res) => {
 
 });
 
-app.get('/web/viewChart', (req, res) => {
-    if (!req.query.data) {
-        res.status(500).json({
-            'error': 'No data passed in the URL parameters'
-        });
-        return;
-    }
-
-    let data = req.query.data;
-    data = (Buffer.from(data, 'base64').toString());
-    // Parse the request body from the POST
-    data = JSON.parse(data);
-
-    //var labels = data.labels;
-    let title = data.Title;
-    let labels = data.Dimensions;
-    let datasets = data.Measures;
-
-    res.render(path.join(__dirname, './views/chart'), {
-        title: title,
-        labels: labels,
-        datasets: datasets
-    });
-});
-
 app.get('/web/Products', (req, res) => {
      
     if (!req.query.data) {
@@ -117,6 +95,30 @@ app.get('/web/Products', (req, res) => {
     res.render(path.join(__dirname, './views/Products'), {
         selectedProduct: selectedProduct,
         similarProducts: similarProducts
+    });
+});
+
+app.get('/web/Store', (req, res) => {
+     
+    /* if (!req.query.data) {
+        res.status(500).json({
+            'error': 'No data passed in the URL parameters'
+        });
+        return;
+    }
+    
+    let data = req.query.data;
+    data = (Buffer.from(data, 'base64').toString());
+    // Parse the request body from the POST
+    data = JSON.parse(data); */
+    let location = {};
+    location.lat = -37.8136;
+    location.lng = 144.9631;
+    //let address = 'Melbourne, Victoria';
+    let address = {'address':'Paris, France'};
+    res.render(path.join(__dirname, './views/Store'), {
+        location,
+        address
     });
 });
 
@@ -209,14 +211,49 @@ function handleIntent(sender_psid, intent)
     }
 }
 
-function handleImageMessage(sender_psid, image)
+function handleImageMessage(sender_psid, image_url)
 {
     let response = config.ListTemplate;
-    response.attachment.payload.elements = mockServer.FormatElments(mockServer.ImageSimilarityAPIResult);
-    //response.attachment.payload.elements = config.ElementList;
-    response.attachment.payload.buttons[0].url = mockServer.BuildViewProductsUrl(mockServer.ImageSimilarityAPIResult);
-    
-    callSendAPI(sender_psid, response);
+    //console.log(JSON.stringify(image));
+    let request_body = {
+        //'url': 'https://assets.academy.com/mgen/56/20039256.jpg'
+        //'url': './images/shoe_test.jpg'
+        'url': image_url
+        }; 
+    axios.post(config.getItemSimilarityUrl(), request_body, {
+            headers: {
+                'Content-Type': 'application/json',
+                //'withCredentials': true
+            }
+        })
+        .then(res => {    
+                if(res.status === 500)
+                {
+                    response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
+                    //response = {'text': 'An error has occurred on invoking item similarity api.'};
+                    callSendAPI(sender_psid, response);
+                    return;
+                }
+                let result = util.FormatItemResult(res.data);
+                console.log(JSON.stringify(result));
+                if(result && result.length === 0)
+                {
+                    //no matched product found.
+                    response = intentHelper.GenerateTextResponse(i18n.NoMatchedProductReply);
+                } else{
+                    response.attachment.payload.elements = util.FormatElments2(result);
+                    response.attachment.payload.buttons[0].url = util.BuildViewProductsUrl(result);
+                    console.log(response.attachment.payload.buttons[0].url);
+                }
+                
+                callSendAPI(sender_psid, response);
+    })
+    .catch(err => {
+        console.log('error caught in handleImageMessage!');
+        console.log(err);
+        response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
+        callSendAPI(sender_psid, response);
+    })
 }
 
 function handleShowCartIntent(sender_psid)
@@ -239,7 +276,7 @@ function handleMessage(sender_psid, received_message) {
         received_message.attachments.forEach(element =>{
             if(element.type === 'image')
             {
-                handleImageMessage(sender_psid, element);
+                handleImageMessage(sender_psid, element.payload.url);
             }
             else
             {
