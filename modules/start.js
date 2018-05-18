@@ -25,11 +25,11 @@ const normalize = require("./normalize")
 
 
 function Initialize() {
-    var erps = ['b1', 'byd']
+    var erps = ['byd', 'b1']
 
     sql.Initialize(function (error) {
         if (!error) {
-            var call = 1
+            var call = 0
             for (key in erps) {
                 loadErpItems(erps[key], null, function (origin) {
                     call++;
@@ -85,7 +85,7 @@ function InsertItemVectorDB(data) {
     for (property in data) {
         var values = data[property].values
         for (var i = 0; i < values.length; i++) {
-            if (!isImage(values[i].image)) {
+            if (!values[i].image || !isImage(values[i].image)) {
                 continue
             } else {
                 values[i].origin = property;

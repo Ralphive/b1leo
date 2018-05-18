@@ -15,7 +15,7 @@ function Process(endpoint, callback) {
 
     var body = {
         "url": $("#testUrl").val(),
-        "similarItems": 5
+        "similarItems": 40
     }
 
     postData("./SimilarItems", body, function (data) {

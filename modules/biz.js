@@ -388,14 +388,18 @@ function GetSalesOrders(query, callback) {
 function UpdateItemPrices() {
     sql.SelectErpItems("byd", function (error, result) {
 
-        var filter = filter = "productid" + odata.op("eq") + odata.qt(result[0].productid);
+
         for (item in result) {
-            filter += odata.op("or") + "productid" + odata.op("eq") + odata.qt(result[item].productid);
+            if (item == 0) {
+                var filter = filter = "productid" + odata.op("eq") + odata.qt(result[0].productid);
+            } else {
+                filter += odata.op("or") + "productid" + odata.op("eq") + odata.qt(result[item].productid);
+            }
         }
 
         byd.GetItemPrice({ $filter: filter }, function (err, prices) {
 
-            if(!err){
+            if (!err) {
                 for (key in prices.value) {
                     var row = {
                         productid: prices.value[key].CIPR_PRODUCT,
@@ -405,7 +409,7 @@ function UpdateItemPrices() {
                     }
                     sql.InsertPrice(row)
                 }
-            }else{
+            } else {
                 console.error(err)
             }
         })
