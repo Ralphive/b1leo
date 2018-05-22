@@ -1,6 +1,6 @@
 {
-    "OrderID": "DocEntry",
-    "OrderNum": "DocNum",
+    "OrderID": "DocNum",
+    "OrderNum": "DocEntry",
     "OrderDate": "DocDate",
     "OrderCur": "DocCurrency",
     "OrderAmnt": "DocTotal" 

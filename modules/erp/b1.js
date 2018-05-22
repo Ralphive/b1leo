@@ -117,6 +117,7 @@ function PostSalesOrder(body, callback) {
     options.body = {
         "CardCode" : process.env.B1_DEFAULT_BP,
         "DocDueDate" : moment().format('YYYY-MM-DD'),
+        "Comments": "Order created via SMB Mkt Place @" + moment.now(),
         "DocumentLines":[]
     }
     options.body.DocumentLines = JSON.parse(b1Normalize(JSON.stringify(body.lines)))
