@@ -2,6 +2,7 @@ const ejs = require('ejs');
 const fb_nlp = require('./fb_nlp');
 const mockserver = require('./MockServer');
 const util = require('./util');
+const config = require('./config');
 //Query: show me the sales and gross profit for customer C20000
 exports.Top3CustomerSalesTestData = {
     "status": 0,
@@ -530,7 +531,7 @@ function GeneralIntentReply(targetIntent){
 //testRandom(10, 3);
 function testGeneralIntents(runCount)
 {
-    let testIntents = ['BotAge', 'BotName', 'BotGender', 'BotCreator', 'B1MovieStar'];
+    let testIntents = ['BotAge', 'BotName', 'BotGender', 'BotCreator', 'B1MovieStar', 'ShowCart'];
     let max = testIntents.length;
     for(let i = 0; i < runCount; i++){
         let randomIndex = random(max);
@@ -539,7 +540,8 @@ function testGeneralIntents(runCount)
     }
 }
 
-//testGeneralIntents(30);
+//GeneralIntentReply('B1MovieStar');
+testGeneralIntents(30);
 
 function testEncodedProductData()
 {
@@ -583,4 +585,6 @@ function testFormatItemResult()
     console.log(JSON.stringify(result));
 }
 
-testFormatItemResult();
+//testFormatItemResult();
+
+//console.log(config.getFbUserLocationUrl('1721196817934442'));

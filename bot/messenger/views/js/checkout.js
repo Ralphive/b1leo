@@ -68,10 +68,14 @@ ${byd_order_msg}`;
                 msg = `No order placed.`
             }
 
-            alert(msg);
+            //alert(msg);
+            $('#operationSuccessAlert').empty();
+            $('#operationSuccessAlert').append(`<p>${msg}</p>`);
+            $('#operationSuccessModal').modal('show');
         })
         .fail(function (xhr, status, error) {
-            alert('An error has occurred: ' + JSON.stringify(xhr));
+            //alert('An error has occurred: ' + JSON.stringify(xhr));
+            $('#operationFailureModal').modal('show');
         })
         .always(function () {
             //alert("complete");

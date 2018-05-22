@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>My Shopping Cart</title>
+  <title>Matched Products Detail</title>
   <link rel="stylesheet" href="./css/bootstrap.min.css">
   <style>
     .glyphicon {
@@ -71,13 +71,36 @@
 
 <body class="container" id="body">
 
-    <div class="page-header">
-        <h1><strong>Products</strong>
-          <div style="float: right; cursor: pointer;">
-            <span class="glyphicon glyphicon-shopping-cart my-cart-icon"><span class="badge badge-notify my-cart-badge"></span></span>
-          </div>
-        </h1>
-      </div>
+	<div class="page-header">
+		<h1>
+			<strong>Product Detail</strong>
+			<div style="float: right; cursor: pointer;"><span class="glyphicon glyphicon-shopping-cart my-cart-icon"><span class="badge badge-notify my-cart-badge"></span></span>
+			</div>
+		</h1>
+	</div>
+
+	<div class="modal fade" id="operationSuccessModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="operationSuccessAlert" class="alert alert-success alert-dismissable">
+						<!-- <strong>Order placed</strong> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="operationFailureModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="operationFailureAlert" class="alert alert-danger alert-dismissable">
+						<strong>An error has occured on placing the order.</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!--Placeholder for Selected Product div: to be added dynamically-->
 	<!--Placeholder for Similar Product label div: to be added dynamically-->
 	<!--Placeholder for Similar Products div: to be added dynamically-->
@@ -91,7 +114,6 @@
 			let similarProducts = <%- JSON.stringify(similarProducts); %>;
 	</script>
 	<script src="./js/products.js"></script>
-
 
 </body>
 

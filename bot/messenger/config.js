@@ -9,7 +9,9 @@ exports.Decimal = 2;
 exports.FbMaxNoInList = 4;
 exports.EnableFbNlp = true;
 exports.NlpConfidenceThreshhold = 0.80;
+exports.AccessToken = 'EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD';
 exports.VERIFY_TOKEN = "yatsea-SMBAssistantBot";
+exports.Port = 1338;
 exports.ListTemplate = {
     "attachment": {
         "type": "template",
@@ -32,13 +34,6 @@ exports.ElementTemplate = `{
     "title": "",
     "image_url": "",
     "subtitle": "",
-    "default_action": {
-        "type": "web_url",
-        "url": "",
-        "messenger_extensions": true,
-        "webview_height_ratio": "tall",
-        "fallback_url": ""
-    },
     "buttons": [
         {
             "title": "View Detail",
@@ -60,10 +55,11 @@ exports.GenericTemplate = {
             "elements": [{
                 "title": "<Placeholder>",
                 "subtitle": "<Placeholder>",
+                "image_url": "<Placeholder>",
                 "buttons": [{
                     "type": "web_url",
-                    "title": "View Chart",
-                    "webview_height_ratio": "compact",
+                    "title": "View Detail",
+                    "webview_height_ratio": "tall",
                     "url": "https://b1assistantmessengerbot.cfapps.eu10.hana.ondemand.com/b1chatbot/client/test.html",
                 }],
             }]
@@ -82,4 +78,9 @@ exports.getUrl = function (url,encodedData) {
 exports.getItemSimilarityUrl = function()
 {
     return `${exports.smbmkt_root_url}${exports.smbmkt_similarity_endpoint}`;    
+}
+
+exports.getFbUserLocationUrl = function(user_id)
+{
+    return `https://graph.facebook.com/${user_id}?fields=location&access_token=${exports.AccessToken}`;    
 }

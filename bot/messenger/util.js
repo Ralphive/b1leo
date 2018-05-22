@@ -26,7 +26,7 @@ In Stock: ${e.inventoryLevel}`;
         let productUrl = config.getProductUrl(exports.encodeData(data));
 
         entry.image_url = e.ImageUrl;
-        entry.default_action.url = productUrl;
+        //entry.default_action.url = productUrl;
         //entry.default_action.fallback_url = productUrl;
 
         entry.buttons[0].url = productUrl;
@@ -99,6 +99,8 @@ exports.FormatItemResult = function(result){
 exports.FormatElments2 = function(result)
 {
     let elements = [];
+    
+    let template = result.length > 1? config.ElementTemplate : config.GenericTemplate;
 
     result.forEach(e => {
         let entry =  JSON.parse(config.ElementTemplate);
@@ -119,7 +121,7 @@ In Stock: ${e.inventoryLevel}`;
         console.log(`add2chart url
 ${productUrl}`);
         entry.image_url = e.image;
-        entry.default_action.url = productUrl;
+        //entry.default_action.url = productUrl;
         //entry.default_action.fallback_url = productUrl;
 
         entry.buttons[0].url = productUrl;
