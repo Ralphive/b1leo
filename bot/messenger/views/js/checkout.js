@@ -45,6 +45,7 @@ function checkout(products) {
             contentType: 'application/json',
             crossDomain: true
         }).done(function (data) {
+            console.log(JSON.stringify(data));
             let b1_order = data.b1;
             let byd_order = data.byd;
             let b1_order_msg = '';
@@ -69,6 +70,7 @@ ${byd_order_msg}`;
             }
 
             //alert(msg);
+            console.log(msg);
             $('#operationSuccessAlert').empty();
             $('#operationSuccessAlert').append(`<p>${msg}</p>`);
             $('#operationSuccessModal').modal('show');

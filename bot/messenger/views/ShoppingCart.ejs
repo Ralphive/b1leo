@@ -1,10 +1,12 @@
 <html>
 <header>
     <title>My Shopping Cart</title>
+    <link rel="stylesheet" href="./css/cart.css" />
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
     <script src="./js/jquery-2.2.4.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
     <script src="./js/checkout.js"></script>
     <script src="./js/shopping_cart.js"></script>
-    <link rel="stylesheet" href="./css/cart.css" />
 </header>
 
 <body>
@@ -65,6 +67,29 @@
         <button id="checkout" class="checkout">Checkout</button>
 
     </div>
+
+    <div class="modal fade" id="operationSuccessModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div id="operationSuccessAlert" class="alert alert-success alert-dismissable">
+                            <!-- <strong>Order placed</strong> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="operationFailureModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div id="operationFailureAlert" class="alert alert-danger alert-dismissable">
+                            <strong>An error has occured on placing the order.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>
 
 </html>

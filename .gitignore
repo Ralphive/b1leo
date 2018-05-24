@@ -62,3 +62,4 @@ typings/
 
 #node_modules for bot
 bot/messenger/node_modules/
+.vscode/launch.json

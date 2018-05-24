@@ -43,6 +43,7 @@ $(document).ready(function () {
     $('#checkout').click(function () {
         checkout(products);
         $('#productList').empty();
+        recalculateCart();
     });
     /* Recalculate cart */
     function recalculateCart() {
