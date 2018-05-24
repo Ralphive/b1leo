@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Store Location</title>
+	<link rel="stylesheet" href="./css/bootstrap.min.css">
+	<meta name="viewport" content="initial-scale=1.0">
+	<meta charset="utf-8">
+	<style>
+		/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+		#map {
+			height: 100%;
+		}
+
+		/* Optional: Makes the sample page fill the window. */
+
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="map"></div>
+	<div id="form">
+		<table>
+			<tr>
+				<td>
+					<strong>Name:</strong>
+				</td>
+				<td id="name">Premium Shoes Shop</td>
+			</tr>
+			<tr>
+				<td>
+					<strong>Address:</strong>
+				</td>
+				<td id="address">Rua Arcp Ezequias, 112 - Sé São Paulo, Brazil</td>
+			</tr>
+			<tr>
+				<td>
+					<strong>Contact:</strong>
+				</td>
+				<td id="contact">T: 81973479</td>
+			</tr>
+			<tr>
+				<td>
+					<strong>Leave a Message:</strong>
+				</td>
+				<td>
+					<input type='text' id='msg' />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<input type='submit' value='Submit' onclick='#' />
+				</td>
+			</tr>
+		</table>
+	</div>
+	<script>
+		let map;
+		let geocoder;
+		let marker;
+		let infowindow;
+		let messagewindow;
+
+		let storeLocation = <%- JSON.stringify(location); %>;
+		//let storeLocation;
+		let address = <%- JSON.stringify(address); %>;
+		address = address.address;
+		console.log(`Address: ${address}`);
+		//if no address found from input, set default address as melbourne
+		if (typeof address === 'undefined' || address.length === 0) {
+			address = 'Melbourne,Victoria';
+		}
+
+		function createMap(location, zoom) {
+			map = new google.maps.Map(document.getElementById('map'), {
+				center: location,
+				zoom: zoom
+			});
+			
+			marker = new google.maps.Marker({
+				position: location,
+				map: map
+			});
+
+			infowindow = new google.maps.InfoWindow({
+				content: document.getElementById('form')
+			});
+
+			google.maps.event.addListener(marker, 'click', function () {
+				infowindow.open(map, marker);
+			});
+		}
+
+		function initMap() {
+			geocoder = new google.maps.Geocoder();
+			if (geocoder) {
+				geocoder.geocode({
+					'address': address
+				}, function (results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
+							storeLocation = results[0].geometry.location;
+							console.log('address decoded successfully');
+						} else {
+							console.log("Address not found in Googlemap.");
+						}
+					} else {
+						console.log("Geocode was not successful for the following reason: " + status);
+					}
+
+					createMap(storeLocation, 15);
+				});
+			}
+			//test
+
+		}
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpFWE0i2e7Nj3fZcK95Jqyt28wceGXTPI&callback=initMap" async
+	    defer></script>
+</body>
+
+</html>

@@ -3,63 +3,10 @@ $(document).ready(function () {
     var taxRate = 0.05;
     var shippingRate = 15.00;
     var fadeTime = 300;
-    localStorage.products = localStorage.products?localStorage.products:'[]';
+    localStorage.products = localStorage.products ? localStorage.products : '[]';
     let products = JSON.parse(localStorage.products);
 
-
-    var ImageSimilarityAPIResult = [{
-        "ItemCode": "A10000",
-        "ItemDescription": "Rakuten",
-        "UnitPrice": 1200.50,
-        "Currency": "USD",
-        "InStock": 12,
-        "ImageUrl": "https://r.r10s.jp/com/global/en/img/gtop/shoes/Category-1.jpg"
-    }, {
-        "ItemCode": "A20000",
-        "ItemDescription": "Ellyn",
-        "UnitPrice": 1899,
-        "Currency": "USD",
-        "InStock": 10,
-        "ImageUrl": "https://riverisland.scene7.com/is/image/RiverIsland/703250_back?wid=1200"
-    }, {
-        "ItemCode": "A30000",
-        "ItemDescription": "BYRON",
-        "UnitPrice": 3499,
-        "Currency": "USD",
-        "InStock": 1,
-        "ImageUrl": "https://s3-ap-southeast-2.amazonaws.com/bettss3/images/003cys403_w600_h600.jpg"
-    }, {
-        "ItemCode": "A40000",
-        "ItemDescription": "Pigalle 100 Flamenco Leather",
-        "Currency": "USD",
-        "UnitPrice": 6999,
-        "InStock": 0,
-        "ImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl196-joFAGjI3v9wpnRQOqesW3YmWKJHcLWbWuTWOxt2EwCO2"
-    }];
-
     //load the shopping cart from localstorage or db???
-    /* ImageSimilarityAPIResult.forEach(element => {
-        $('#productList').append(`<div class="product">
-    <div class="product-image">
-        <img src="${element.ImageUrl}">
-    </div>
-    <div class="product-details">
-        <div class="product-title">${element.ItemCode}</div>
-        <p class="product-description">${element.ItemDescription}</p>
-    </div>
-    <div class="product-price">${element.UnitPrice}</div>
-    <div class="product-quantity">
-        <input type="number" value="1" min="1">
-    </div>
-    <div class="product-removal">
-        <button class="remove-product">
-            Remove
-        </button>
-    </div>
-    <div class="product-line-price">${element.UnitPrice}</div>
-</div>`);
-    }); */
-
     products.forEach(element => {
         let lineTotal = element.quantity * element.price;
         $('#productList').append(`<div class="product">
@@ -67,23 +14,23 @@ $(document).ready(function () {
         <img src="${element.image}">
     </div>
     <div class="product-details">
-        <div class="product-title">${element.name}</div>
-        <p class="product-description">${element.summary}</p>
+        <div class="product-title">${element.id}</div>
+        <p class="product-description">${element.name}</p>
     </div>
-    <div class="product-price">${element.price}</div>
+    <div class="product-price">${element.price.toFixed(2)}</div>
     <div class="product-quantity">
-        <input type="number" value="${element.quantity}" min="1">
+        <input type="number" data-id="${element.id}" value="${element.quantity}" min="1">
     </div>
     <div class="product-removal">
-        <button class="remove-product">
+        <button class="remove-product" data-id="${element.id}">
             Remove
         </button>
     </div>
-    <div class="product-line-price">${lineTotal}</div>
+    <div class="product-line-price">${lineTotal.toFixed(2)}</div>
 </div>`);
     });
     recalculateCart();
-    
+
     /* Assign actions */
     $('.product-quantity input').change(function () {
         updateQuantity(this);
@@ -93,6 +40,11 @@ $(document).ready(function () {
         removeItem(this);
     });
 
+    $('#checkout').click(function () {
+        checkout(products);
+        $('#productList').empty();
+        recalculateCart();
+    });
     /* Recalculate cart */
     function recalculateCart() {
         var subtotal = 0;
@@ -122,9 +74,6 @@ $(document).ready(function () {
         });
     }
 
-    
-
-
     /* Update quantity */
     function updateQuantity(quantityInput) {
         /* Calculate line price */
@@ -132,7 +81,19 @@ $(document).ready(function () {
         var price = parseFloat(productRow.children('.product-price').text());
         var quantity = $(quantityInput).val();
         var linePrice = price * quantity;
+        let id = quantityInput.dataset.id;
 
+        for(let i = 0; i < products.length; i ++)
+        {
+            if(products[i].id === id)
+            {
+                console.log(`quantity of ${id} udpated as ${quantity}`);
+                products[i].quantity = quantity;
+                break;
+            }
+        }
+
+        localStorage.products = JSON.stringify(products);
         /* Update line price display and recalc cart totals */
         productRow.children('.product-line-price').each(function () {
             $(this).fadeOut(fadeTime, function () {
@@ -143,13 +104,26 @@ $(document).ready(function () {
         });
     }
 
-
+    function removeProductById(productList, id) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].id === id) {
+                productList.splice(i, 1);
+                console.log(`product-${id} removed`);
+                return;
+            }
+        }
+    }
     /* Remove item from cart */
     function removeItem(removeButton) {
         /* Remove row from DOM and recalc cart total */
         var productRow = $(removeButton).parent().parent();
         productRow.slideUp(fadeTime, function () {
             productRow.remove();
+            
+            let id = removeButton.dataset.id;
+            removeProductById(products, id);
+            localStorage.products = JSON.stringify(products);
+            
             recalculateCart();
         });
     }

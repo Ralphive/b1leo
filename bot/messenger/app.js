@@ -2,17 +2,23 @@
  * SAP SMB Assistant Bot in Facebook Messenger
  *
  * To run this code, you must do the following:
- *
- * 1. Deploy this code to a server running Node.js
- * 2. Run `npm install`
- * 3. Update the VERIFY_TOKEN in config.js
- * 4. Add your PAGE_ACCESS_TOKEN to your environment vars
- *
+ * 1. Follow the facebook developer manual to create a messenger bot with message and user_location service https://developers.facebook.com/docs/messenger-platform/getting-started
+ * 2. Update the VERIFY_TOKEN for your messenger bot in config.js, which will be used on registered the web hook to fb messenger
+ * 3. Update the PAGE_ACCESS_TOKEN for your messenger bot in config.js
+ * 4. Deploy this code to a server running Node.js
+ * Option 1: Deploy to SAP Cloud Platform, Cloud Foundry
+ * Step 1: run 'cf login' to login SAP Cloud Platform, Cloud Foundry wity your credential
+ * Step 2: run 'cf push' to deploy the app to SAP Cloud Platform, Cloud Foundry.
+ * As result, you can find out the urls of your messenger bot.
+ * for example: https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com (Please add https:// at the beginning of url)
+ * Step 3: Setup the web hook of the messenger bot with url above. You need to enter the VERIFY_TOKEN you have setup in step 2 above.
+ * 
+ * Option 2: Deploy the a server with nodejs run-time.
+ * Step 1: run 'npm install' to install dependence of the app
+ * Step 2: run 'npm start' to start the app
  */
-
 'use strict';
-const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || 'EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD';
-const PORT = process.env.PORT || 1338;
+
 // Imports dependencies and set up http server
 const
     request = require('request'),
@@ -25,9 +31,13 @@ const
     i18n = require('./i18n'),
     config = require('./config'),
     fb_nlp = require('./fb_nlp'),
-    mockServer = require('./MockServer');
-    //b1BotProxy = require('./B1ChatbotProxy.js');
-    
+    mockServer = require('./MockServer'),
+    util = require('./util'),
+    intentHelper = require('./IntentHelper'),
+    axios = require('axios');
+
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || config.AccessToken;
+const PORT = process.env.PORT || config.Port;
 console.log('app started');
 app.use('/web', express.static(path.join(__dirname, './views')));
 
@@ -70,54 +80,97 @@ app.post('/webhook', (req, res) => {
 
 });
 
-app.get('/web/viewChart', (req, res) => {
-    if (!req.query.data) {
-        res.status(500).json({
-            'error': 'No data passed in the URL parameters'
-        });
-        return;
-    }
-
-    let data = req.query.data;
-    data = (Buffer.from(data, 'base64').toString());
-    // Parse the request body from the POST
-    data = JSON.parse(data);
-
-    //var labels = data.labels;
-    let title = data.Title;
-    let labels = data.Dimensions;
-    let datasets = data.Measures;
-
-    res.render(path.join(__dirname, './views/chart'), {
-        title: title,
-        labels: labels,
-        datasets: datasets
-    });
-});
-
 app.get('/web/Products', (req, res) => {
-     
+
     if (!req.query.data) {
         res.status(500).json({
             'error': 'No data passed in the URL parameters'
         });
         return;
     }
-    
+
     let data = req.query.data;
     data = (Buffer.from(data, 'base64').toString());
     // Parse the request body from the POST
     data = JSON.parse(data);
-    
+
     //var labels = data.labels;
     // let selectedProduct = mockServer.ImageSimilarityAPIResult[3];
     // let similarProducts = mockServer.ImageSimilarityAPIResult;
     let selectedProduct = data.selectedProduct;
-    let similarProducts = data.similarProducts;
+    let similarProducts = []; //data.similarProducts;
+    data.similarProducts.forEach(product => {
+        if (product.productid !== selectedProduct.productid) {
+            similarProducts.push(product);
+        }
+    });
     res.render(path.join(__dirname, './views/Products'), {
         selectedProduct: selectedProduct,
         similarProducts: similarProducts
     });
+});
+
+app.get('/web/Store', (req, res) => {
+
+    /* if (!req.query.data) {
+        res.status(500).json({
+            'error': 'No data passed in the URL parameters'
+        });
+        return;
+    }
+    
+    let data = req.query.data;
+    data = (Buffer.from(data, 'base64').toString());
+    // Parse the request body from the POST
+    data = JSON.parse(data); 
+    */
+    //default user_id and location.
+    let user_id = '1721196817934442';
+    let location = {};
+    location.lat = -37.8136;
+    location.lng = 144.9631;
+    //let address = 'Melbourne, Victoria';
+    let address = {
+        'address': 'Sao Paulo, Brazil'
+    };
+    try {
+        axios.get(config.getFbUserLocationUrl(user_id))
+            .then(res2 => {
+                let user = res2.data;
+                console.log(user);
+
+                if (util.CheckType(user) && util.CheckType(user.location) && util.CheckType(user.location.name)) {
+                    address = user.location.name;
+                }
+            });
+    } catch (error) {
+        console.log(error);
+    } finally {
+        res.render(path.join(__dirname, './views/Store'), {
+            location,
+            address
+        });
+    }
+    // axios.get(config.getFbUserLocationUrl(user_id))
+    // .then(res2 =>{
+    //     let user = res2.data;
+    //     console.log(user);
+
+    //     if(util.CheckType(user) && util.CheckType (user.location) && util.CheckType(user.location.name)){
+    //         address = user.location.name;
+    //     }
+    //     res.render(path.join(__dirname, './views/Store'), {
+    //         location,
+    //         address
+    //     });
+    // })
+    // .catch(error => {
+    //     console.log(error);
+    //     res.render(path.join(__dirname, './views/Store'), {
+    //         location,
+    //         address
+    //     });
+    //   });; 
 });
 
 app.get('/web/ShoppingCart', (req, res) => {
@@ -142,6 +195,16 @@ app.get('/web/ShoppingCart', (req, res) => {
 
     res.render(path.join(__dirname, './views/ShoppingCart'), {
         products: mockServer.ImageSimilarityAPIResult
+    });
+});
+
+app.get('/web/DeliverySetting', (req, res) => {
+    res.render(path.join(__dirname, './views/DeliverySetting'), {
+    });
+});
+
+app.get('/web/PaymentSetting', (req, res) => {
+    res.render(path.join(__dirname, './views/PaymentSetting'), {
     });
 });
 
@@ -187,16 +250,13 @@ function isThank(text) {
     return text.includes('thank') || text.includes('gracia');
 }
 
-
-
 /**
  * A generic text intent handler
  * @param {sender id} sender_psid 
  * @param {the identified intent} intent 
  */
-function handleIntent(sender_psid, intent)
-{
-    let repsonse;
+function handleIntent(sender_psid, intent) {
+    let response;
     if (intent) {
         let reply = fb_nlp.GeneralIntentReply(intent);
         response = {
@@ -209,41 +269,103 @@ function handleIntent(sender_psid, intent)
     }
 }
 
-function handleImageMessage(sender_psid, image)
-{
-    let response = config.ListTemplate;
-    response.attachment.payload.elements = mockServer.FormatElments(mockServer.ImageSimilarityAPIResult);
-    //response.attachment.payload.elements = config.ElementList;
-    response.attachment.payload.buttons[0].url = mockServer.BuildViewProductsUrl(mockServer.ImageSimilarityAPIResult);
-    
-    callSendAPI(sender_psid, response);
+function handleImageMessage(sender_psid, image_url) {
+    let response;
+    //console.log(JSON.stringify(image));
+    let request_body = {
+        //'url': 'https://assets.academy.com/mgen/56/20039256.jpg'
+        //'url': './images/shoe_test.jpg'
+        'url': image_url
+    };
+    axios.post(config.getItemSimilarityUrl(), request_body, {
+            headers: {
+                'Content-Type': 'application/json',
+                //'withCredentials': true
+            }
+        })
+        .then(res => {
+            // console.info('status %s', res.status);
+            // console.log(JSON.stringify(res.data));
+            // if (res.status === 500) {
+            //     if(res.data && res.data.message && res.data.message.includes('Extract vector'))
+            //     {
+            //         console.log('Image resolution too high.');
+            //         response = intentHelper.GenerateTextResponse(i18n.ImageResolutionErrReply);
+            //     }
+            //     else{
+            //         response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
+            //     }
+                
+            //     callSendAPI(sender_psid, response);
+            //     return;
+            // }
+            
+            let result = util.FormatItemResult(res.data);
+            console.log(JSON.stringify(result));
+
+            if (result && result.length === 0) {
+                //no matched product found.
+                response = intentHelper.GenerateTextResponse(i18n.NoMatchedProductReply);
+            } else if (result.length === 1) {
+                //only matched product found, render with Generic Templage.
+                response = config.GenericTemplate;
+                let entry = response.attachment.payload.elements[0];
+                let product = result[0];
+
+                entry.title = `${product.productid}(${product.score})`;
+                entry.subtitle =
+`${product.name}
+Price: ${product.price}${product.priceCurrency}
+In Stock: ${product.inventoryLevel}`;
+                entry.image_url = product.image;
+
+                let data = {};
+                data.selectedProduct = product,
+                data.similarProducts = [];
+                let productUrl = config.getProductUrl(util.encodeData(data));
+                entry.buttons[0].url = productUrl;
+                console.log(`add2chart url
+${productUrl}`);
+            } else {
+                //multiple matched products found, render with list template
+                response = config.ListTemplate;
+                response.attachment.payload.elements = util.FormatElments2(result);
+                response.attachment.payload.buttons[0].url = util.BuildViewProductsUrl(result);
+                console.log(response.attachment.payload.buttons[0].url);
+            }
+
+            callSendAPI(sender_psid, response);
+        })
+        .catch(err => {
+            console.log('error caught in handleImageMessage!');
+            console.error(err);
+            //At current stage, only Internal Server Problem-image resolution too high falling into this.
+            response = intentHelper.GenerateTextResponse(i18n.ImageResolutionErrReply);
+            //response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
+            callSendAPI(sender_psid, response);
+        });
 }
 
-function handleShowCartIntent(sender_psid)
-{
+function handleShowCartIntent(sender_psid) {
     let response = config.ListTemplate;
     response.attachment.payload.elements = mockServer.FormatElments(mockServer.ImageSimilarityAPIResult);
     //response.attachment.payload.elements = config.ElementList;
     response.attachment.payload.buttons[0].url = mockServer.BuildViewProductsUrl(mockServer.ImageSimilarityAPIResult);
-    
+
     callSendAPI(sender_psid, response);
 }
 
 function handleMessage(sender_psid, received_message) {
     //ignore the response from ping the webhook.
     console.log(received_message);
-    let response ={};
+    let response = {};
 
-    if(received_message.attachments)
-    {
-        received_message.attachments.forEach(element =>{
-            if(element.type === 'image')
-            {
-                handleImageMessage(sender_psid, element);
-            }
-            else
-            {
-                handleIntent(sender_psid, 'InvalidAttachment');   
+    if (received_message.attachments) {
+        received_message.attachments.forEach(element => {
+            if (element.type === 'image') {
+                handleImageMessage(sender_psid, element.payload.url);
+            } else {
+                handleIntent(sender_psid, 'InvalidAttachment');
             }
         });
 
@@ -251,7 +373,7 @@ function handleMessage(sender_psid, received_message) {
         console.log(received_message.attachments[0].payload);
         return;
     }
-    
+
     // if (!received_message.text)
     //     return;
     console.log(`MessageObject: ${JSON.stringify(received_message)}`);
@@ -275,8 +397,7 @@ function handleMessage(sender_psid, received_message) {
         }
     }
 
-    if(intent === i18n.ShowCartIntent)
-    {
+    if (intent === i18n.ShowCartIntent) {
         handleShowCartIntent(sender_psid);
     }
 
