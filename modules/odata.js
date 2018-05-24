@@ -5,7 +5,25 @@ module.exports = {
     },
     formatResponse: function (body) {
         return (formatResponse(body))
-    }
+    },
+    qt: function (val) {
+        return (qt(val))
+    },
+    op: function (val) {
+        return (op(val))
+    },
+}
+
+function qt(val) {
+    //Quotes
+    return "'" + val + "'";
+    //return "%27" + val + "%27";
+}
+
+function op(val) {
+    //Operation
+    return " " + val + " ";
+    //return "%20" + val + "%20";
 }
 
 function formatQuery(query, select) {
@@ -23,6 +41,10 @@ function formatQuery(query, select) {
 
     if (query && query.hasOwnProperty("$filter")) {
         qs["$filter"] = query["$filter"]
+    }
+
+    if (query && query.hasOwnProperty("$expand")) {
+        qs["$expand"] = query["$expand"]
     }
 
     if(select){

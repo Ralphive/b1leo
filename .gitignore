@@ -57,9 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
-#.vscode debug launch option
-.vscode/
+.vscode
 
-#node_modules for bot
-bot/messenger/node_modules/
-.vscode/launch.json

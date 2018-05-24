@@ -1,6 +1,6 @@
 applications:
 - name: smbmkt
-  memory: 128m
+  memory: 256m
   instances: 1
 buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
 env:
@@ -13,3 +13,6 @@ env:
     "BYD_PORT": ""
     "BYD_PATH": "/sap/byd/odata/cust/v1"
     "BYD_DEFAULT_BP": "CP100110"
+    "TEMP_DIR": "files/tmp"
+    "VECTOR_DIR": "files/vectors"
+    "FILE_SEP": "-_-_"
