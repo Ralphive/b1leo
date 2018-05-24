@@ -74,8 +74,8 @@ cf create-service postgresql v9.6-dev postgresql -c '{"ram_gb":1}'
 
 * Bind the services above with your application
 ```
-cf bind-service smbmkt3 redis
-cf bind-service smbmkt3 postgresql
+cf bind-service mysmbmkt redis
+cf bind-service mysmbmkt postgresql
 ```
 * Restart your application (so it can read the new environment variables)
 
