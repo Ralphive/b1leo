@@ -23,7 +23,6 @@ exports.ListTemplate = {
                 "type": "web_url",
                 "title": "View More",
                 "webview_height_ratio": "tall",
-                //"url": "https://6f41daef.ngrok.io/b1chatbot/client/test.html",
                 "url": "https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com/web/Products?data="
             }],
         }

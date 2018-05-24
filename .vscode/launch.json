@@ -14,7 +14,17 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Bot Program",
+            "runtimeExecutable": "/usr/local/bin/node",
+            "protocol": "legacy",
             "program": "${workspaceFolder}/bot/messenger/app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Bot Test Program",
+            "runtimeExecutable": "/usr/local/bin/node",
+            "protocol": "legacy",
+            "program": "${workspaceFolder}/bot/messenger/test.js"
         }
     ]
 }

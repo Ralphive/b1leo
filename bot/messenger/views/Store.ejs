@@ -33,24 +33,20 @@
 				<td>
 					<strong>Name:</strong>
 				</td>
-				<td>Premium Shops</td>
+				<td id="name">Premium Shoes Shop</td>
 			</tr>
 			<tr>
 				<td>
 					<strong>Address:</strong>
 				</td>
-				<td>Rua Arcp Ezequias, 112 - Sé São Paulo, Brazil</td>
+				<td id="address">Rua Arcp Ezequias, 112 - Sé São Paulo, Brazil</td>
 			</tr>
 			<tr>
 				<td>
 					<strong>Contact:</strong>
 				</td>
-				<td>T: 81973479</td>
+				<td id="contact">T: 81973479</td>
 			</tr>
-			<!-- <tr><td>Type:</td> <td><select id='type'> +
-                 <option value='bar' SELECTED>bar</option>
-                 <option value='restaurant'>restaurant</option>
-                 </select> </td></tr> -->
 			<tr>
 				<td>
 					<strong>Leave a Message:</strong>
@@ -121,7 +117,7 @@
 						console.log("Geocode was not successful for the following reason: " + status);
 					}
 
-					createMap(storeLocation, 14);
+					createMap(storeLocation, 15);
 				});
 			}
 			//test

@@ -2,12 +2,20 @@
  * SAP SMB Assistant Bot in Facebook Messenger
  *
  * To run this code, you must do the following:
- *
- * 1. Deploy this code to a server running Node.js
- * 2. Run `npm install`
- * 3. Update the VERIFY_TOKEN in config.js
- * 4. Add your PAGE_ACCESS_TOKEN to your environment vars
- *
+ * 1. Follow the facebook developer manual to create a messenger bot with message and user_location service https://developers.facebook.com/docs/messenger-platform/getting-started
+ * 2. Update the VERIFY_TOKEN for your messenger bot in config.js, which will be used on registered the web hook to fb messenger
+ * 3. Update the PAGE_ACCESS_TOKEN for your messenger bot in config.js
+ * 4. Deploy this code to a server running Node.js
+ * Option 1: Deploy to SAP Cloud Platform, Cloud Foundry
+ * Step 1: run 'cf login' to login SAP Cloud Platform, Cloud Foundry wity your credential
+ * Step 2: run 'cf push' to deploy the app to SAP Cloud Platform, Cloud Foundry.
+ * As result, you can find out the urls of your messenger bot.
+ * for example: https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com (Please add https:// at the beginning of url)
+ * Step 3: Setup the web hook of the messenger bot with url above. You need to enter the VERIFY_TOKEN you have setup in step 2 above.
+ * 
+ * Option 2: Deploy the a server with nodejs run-time.
+ * Step 1: run 'npm install' to install dependence of the app
+ * Step 2: run 'npm start' to start the app
  */
 'use strict';
 
@@ -109,13 +117,13 @@ app.get('/web/Store', (req, res) => {
             'error': 'No data passed in the URL parameters'
         });
         return;
-    }*/
+    }
     
     let data = req.query.data;
     data = (Buffer.from(data, 'base64').toString());
     // Parse the request body from the POST
     data = JSON.parse(data); 
-
+    */
     //default user_id and location.
     let user_id = '1721196817934442';
     let location = {};
@@ -187,6 +195,16 @@ app.get('/web/ShoppingCart', (req, res) => {
 
     res.render(path.join(__dirname, './views/ShoppingCart'), {
         products: mockServer.ImageSimilarityAPIResult
+    });
+});
+
+app.get('/web/DeliverySetting', (req, res) => {
+    res.render(path.join(__dirname, './views/DeliverySetting'), {
+    });
+});
+
+app.get('/web/PaymentSetting', (req, res) => {
+    res.render(path.join(__dirname, './views/PaymentSetting'), {
     });
 });
 
