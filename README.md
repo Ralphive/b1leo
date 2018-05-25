@@ -21,6 +21,7 @@ An SMB Shop Assistant to integrate SAP Business One, SAP Business ByDesign and S
 * Follow the [facebook developer manual](https://developers.facebook.com/docs/messenger-platform/getting-started) to create a messenger bot with message and user_location service 
 * Update the VERIFY_TOKEN for your messenger bot in smbmkt/bot/messenger/config.js, which will be used on registered the web hook to fb messenger
 * Update the PAGE_ACCESS_TOKEN for your messenger bot in smbmkt/bot/messenger/config.js
+* Change the application name in smbmkt/bot/messenger/manifest.yml
 * Browse to the /bot/messenger folder
 * Deploy the messenger app to the SAP Cloud Platform, Cloud Foundry
 * From the /bot/messenger directory, login SAP Cloud Platform, Cloud Foundry with your credentials
