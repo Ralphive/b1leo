@@ -585,6 +585,13 @@ function testFormatItemResult()
     console.log(JSON.stringify(result));
 }
 
+function testSpice()
+{
+    let   myArray = ['a', 'b', 'c', 'd'];
+    myArray.splice(0, 2);
+    console.log(JSON.stringify(myArray));
+}
+testSpice();
 //testFormatItemResult();
 
 //console.log(config.getFbUserLocationUrl('1721196817934442'));
