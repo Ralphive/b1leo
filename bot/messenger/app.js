@@ -539,6 +539,11 @@ function callSendAPI(sender_psid, response) {
             console.log('HTTP Response Status Code:', res && res.statusCode);
             console.log('Body:', JSON.stringify(body));
             console.error("Unable to send message:" + err);
+            if(body && body.error && body.error.message)
+            {
+                let msg = `${i18n.FBMessageAPIErrorReply} ${body.error.message}`;
+                callSendAPI(sender_psid, intentHelper.GenerateTextResponse(msg));
+            }
         }
     });
 }
