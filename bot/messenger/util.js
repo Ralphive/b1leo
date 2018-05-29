@@ -9,6 +9,7 @@ exports.encodeData = function(testData) {
     return result;
 };
 
+//Not in use.
 exports.FormatElments = function(result)
 {
     let elements = [];
@@ -50,7 +51,6 @@ exports.Str2Fixed2 = function(str)
 exports.Str2Perc = function(str)
 {
     let result = (parseFloat(str) * 100).toFixed(config.Decimal);
-    //console.log(`str: ${str}. result: ${result}`);
     return `${result}%`;
 };
 
@@ -69,7 +69,7 @@ exports.FormatItemResult = function(result){
             byd_result = result.byd;
         }
             
-        b1_result.forEach(element =>{
+        b1_result.forEach(element =>{     
             element.source = 'b1';
             //element.score = exports.Str2Perc(element.score);
             element.score = parseFloat(element.score);
@@ -88,6 +88,18 @@ exports.FormatItemResult = function(result){
             return b.score - a.score;
         });
 
+        //eliminate the item without image.
+        //Have to spit into forEach here.
+        finalResult.forEach(element => {
+            let index = finalResult.indexOf(element);
+            if(element.image.length === 0)
+            {
+                console.warn(`Item without image found and eliminated from the result list:
+${JSON.stringify(element)}`);
+                finalResult.splice(index, 1);
+            }
+        });
+
         //format the score to percentage
         finalResult.forEach(element => {
             element.score = exports.Str2Perc(element.score);
@@ -99,15 +111,10 @@ exports.FormatItemResult = function(result){
 exports.FormatElments2 = function(result)
 {
     let elements = [];
-    
-    let template = result.length > 1? config.ElementTemplate : config.GenericTemplate;
 
     result.forEach(e => {
         let entry =  JSON.parse(config.ElementTemplate);
         entry.title = `${e.productid}(${e.score})`;
-        //e.price = 100;
-        //e.inventoryLevel = 10;
-        e.priceCurrency ='$';
         entry.subtitle = 
 `${e.name}
 Price: ${e.price}${e.priceCurrency}
