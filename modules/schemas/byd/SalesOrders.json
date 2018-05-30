@@ -1,7 +1,0 @@
-{
-    "OrderID": "ID",
-    "OrderNum": "ObjectID",
-    "OrderDate": "DateTime",
-    "OrderCur" : "currencyCode",
-    "OrderAmnt": "GrossAmount"
-}
