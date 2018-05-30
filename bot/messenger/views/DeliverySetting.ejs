@@ -1,0 +1,139 @@
+<html>
+<header>
+    <title>Delivery Address</title>
+    <!-- <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css"> -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css" />
+    <script src="./js/jquery-2.2.4.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script> -->
+    <script src="./js/jquery.valiadte.min.js"></script>
+    <script src="./js/delivery_setting.js"></script>
+</header>
+<style>
+    .form-horizontal .control-label {
+        text-align: left;
+    }
+
+    .form-group.required .control-label:after {
+        content: "*";
+        color: red;
+    }
+
+    .form-control.error {
+        border-color: red;
+        outline: 0;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
+    }
+
+    label.error {
+        font-weight: bold;
+        color: red;
+        padding: 2px 8px;
+        margin-top: 2px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-4 col-md-offset-4">
+                <div class="panel panel-default">
+                    <!-- <div class="panel-heading display-table">
+                                <div class="row display-tr">
+                                    <h3 class="panel-title display-td">Payment Details</h3>
+                                </div>
+                            </div> -->
+                    <div class="panel-body">
+                        <form class="form-horizontal" id="delivery-setting-form" role="form">
+                            <fieldset>
+
+                                <!-- Form Name -->
+                                <legend>Default Delivery Address</legend>
+
+                                <!-- Text input-->
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="textinput">Line1</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" id="line1" name="line1" placeholder="Address Line 1" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="textinput">Line2</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" id="line2" name="line2" placeholder="Address Line 2" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="textinput">City</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" id="city" name="city" placeholder="City" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="textinput">State</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="state" name="state" placeholder="State/Province/Region" class="form-control">
+                                    </div>
+
+                                    <label class="col-sm-3 control-label" for="textinput">Postcode</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" id="postCode" name="postCode" placeholder="Post Code" class="form-control">
+                                    </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="textinput">Country</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" id="country" name="country" placeholder="Country" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group required">
+                                    <div class="col-xs-12">
+                                        <button class="save btn btn-success btn-lg btn-block" type="button">Save</button>
+                                    </div>
+                                </div>
+
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container -->
+    <!--Modal alert for operation success and failure-->
+    <div class="modal fade" id="operationSuccessModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="operationSuccessAlert" class="alert alert-success alert-dismissable">
+                        <strong>Delivery setting saved.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="operationFailureModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="operationFailureAlert" class="alert alert-danger alert-dismissable">
+                        <strong>Invalid Delivery setting. Please check again.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

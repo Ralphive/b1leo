@@ -1,6 +1,8 @@
 const ejs = require('ejs');
 const fb_nlp = require('./fb_nlp');
 const mockserver = require('./MockServer');
+const util = require('./util');
+const config = require('./config');
 //Query: show me the sales and gross profit for customer C20000
 exports.Top3CustomerSalesTestData = {
     "status": 0,
@@ -496,10 +498,10 @@ function encodeData(testData) {
 //b1BotProxy.proceedDashboardData4Chartjs(exports.NoData);
 
 let test = [];
-console.log(`[].length: ${test.length}`);
+//console.log(`[].length: ${test.length}`);
 
 let intent = fb_nlp.getNlpFirstIntent(msg_nlp.nlp);
-console.log(intent);
+//console.log(intent);
 
 function random(max)
 {
@@ -529,7 +531,7 @@ function GeneralIntentReply(targetIntent){
 //testRandom(10, 3);
 function testGeneralIntents(runCount)
 {
-    let testIntents = ['BotAge', 'BotName', 'BotGender', 'BotCreator', 'B1MovieStar'];
+    let testIntents = ['BotAge', 'BotName', 'BotGender', 'BotCreator', 'B1MovieStar', 'ShowCart'];
     let max = testIntents.length;
     for(let i = 0; i < runCount; i++){
         let randomIndex = random(max);
@@ -538,7 +540,8 @@ function testGeneralIntents(runCount)
     }
 }
 
-//testGeneralIntents(30);
+//GeneralIntentReply('B1MovieStar');
+testGeneralIntents(30);
 
 function testEncodedProductData()
 {
@@ -548,4 +551,47 @@ function testEncodedProductData()
 
     encodeData(data);
 }
-testEncodedProductData();
+//testEncodedProductData();
+
+function testFormatItemResult()
+{
+    let data = {
+        "byd": [
+            {}
+        ],
+        "b1": [
+            {
+                "productid": "SH0010",
+                "name": "Men's Hiking Boots",
+                "image": "https://i.imgur.com/TwgWkagt.png",
+                "score": "0.7771815875231416"
+            },
+            {
+                "productid": "SH10008",
+                "name": "Mens Running Sneaker",
+                "image": "https://i.imgur.com/PLYdI80m.png",
+                "score": "0.7907924967311178"
+            },
+            {
+                "productid": "SH10009",
+                "name": "Men's High Top Sneaker",
+                "image": "https://i.imgur.com/fI4Q3nCt.png",
+                "score": "0.7967721630722064"
+            }
+        ]
+    };
+
+    let result = util.FormatItemResult(data)
+    console.log(JSON.stringify(result));
+}
+
+function testSpice()
+{
+    let   myArray = ['a', 'b', 'c', 'd'];
+    myArray.splice(0, 2);
+    console.log(JSON.stringify(myArray));
+}
+testSpice();
+//testFormatItemResult();
+
+//console.log(config.getFbUserLocationUrl('1721196817934442'));
