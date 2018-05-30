@@ -20,7 +20,7 @@ applications:
 
   services:
     - cachedb
-    - itemdb
+    - smbmktdb
     
 
 - name: SAP_SMBAssistantBotTest
