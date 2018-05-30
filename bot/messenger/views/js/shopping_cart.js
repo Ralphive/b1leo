@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     //load the shopping cart from localstorage or db???
     products.forEach(element => {
-        let lineTotal = element.quantity * element.price;
+        let lineTotal = element.quantity * parseFloat(element.price);
         $('#productList').append(`<div class="product">
     <div class="product-image">
         <img src="${element.image}">
@@ -17,7 +17,7 @@ $(document).ready(function () {
         <div class="product-title">${element.id}</div>
         <p class="product-description">${element.name}</p>
     </div>
-    <div class="product-price">${element.price.toFixed(2)}</div>
+    <div class="product-price">${element.price}</div>
     <div class="product-quantity">
         <input type="number" data-id="${element.id}" value="${element.quantity}" min="1">
     </div>
