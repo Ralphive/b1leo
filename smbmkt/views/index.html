@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>SMB Market Place Similarity Tester</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css">
+    <!-- Custom styles -->
+    <link href="css/app.css" rel="stylesheet">
+</head>
+
+<body>
+    <main role="main" class="container">
+        <h1>SMB Marketplace  Tester</h1>
+        <p class="lead mb-4">
+            Test the SMB Marketplace
+        </p>
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                    <input id="testUrl" class="form-control" placeholder="Image URL" type="url">
+                    <img id="blah" src="#" width="200" height="200" alt="no image" />
+
+                    <button class="btn btn-primary btn-lg btn-block" id="Similar">Test</button>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Result
+                    </div>
+                    <div class="card-block">
+                        <table class="table .table-striped" id="resultTable">
+                            <thead>
+                                <tr>
+                                    <th>No files uploaded.</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /file list -->
+
+        <div class="alert alert-info" role="alert">
+            Get this app source code on
+            <a href="https://github.com/B1SA/smbmkt">GitHub</a>
+        </div>
+        <div class="alert alert-warning">
+            <pre>No JSON Response</pre>
+        </div>
+    </main>
+    <!-- /container -->
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

@@ -17,14 +17,7 @@ applications:
     "TEMP_DIR": "files/tmp"
     "VECTOR_DIR": "files/vectors"
     "FILE_SEP": "-_-_"
-
+    
   services:
     - cachedb
     - itemdb
-    
-
-- name: SAP_SMBAssistantBotTest
-  memory: 256m
-  path: ./bot/messenger
-  buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
-  instances: 1

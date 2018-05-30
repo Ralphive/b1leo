@@ -1,0 +1,43 @@
+{
+  "name": "smbmkt",
+  "version": "1.0.0",
+  "description": " Smb Marketplace ",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/B1SA/smbmkt.git"
+  },
+  "keywords": [
+    "ml",
+    "sap",
+    "sap",
+    "cloud",
+    "platform",
+    "b1",
+    "sap",
+    "business",
+    "one"
+  ],
+  "author": "Ralph Oliveira - @Ralphive",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/B1SA/smbmkt/issues"
+  },
+  "homepage": "https://github.com/B1SA/smbmkt#readme",
+  "dependencies": {
+    "archiver": "^2.1.1",
+    "async": "^2.6.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "is-image": "^2.0.0",
+    "jsonata": "^1.5.3",
+    "moment": "^2.22.1",
+    "pg": "^7.4.3",
+    "redis": "^2.8.0",
+    "request": "^2.83.0"
+  }
+}
