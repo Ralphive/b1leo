@@ -1,5 +1,6 @@
 # SMB Marketplace
 [![SAP](https://i.imgur.com/S8BS6PX.png)](https://sap.com)
+
 A SMB Shop Assistant to integrate SAP Business One, SAP Business ByDesign and SAP Leonardo on SAP Cloud Platform
 
 ### Pre Requisites
