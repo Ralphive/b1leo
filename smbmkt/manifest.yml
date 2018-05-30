@@ -1,5 +1,5 @@
 applications:
-- name: smbmkt
+- name: smbmktTest
   memory: 256m
   instances: 1
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
@@ -17,14 +17,7 @@ applications:
     "TEMP_DIR": "files/tmp"
     "VECTOR_DIR": "files/vectors"
     "FILE_SEP": "-_-_"
-
+    
   services:
     - cachedb
     - smbmktdb
-    
-
-- name: SAP_SMBAssistantBot
-  memory: 256m
-  path: ./bot/messenger
-  buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
-  instances: 1

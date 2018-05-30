@@ -1,4 +1,3 @@
----
 applications:
 - name: SAP_SMBAssistantBot
   memory: 256m
