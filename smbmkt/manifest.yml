@@ -20,4 +20,4 @@ applications:
     
   services:
     - cachedb
-    - itemdb
+    - smbmktdb

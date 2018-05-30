@@ -1,5 +1,5 @@
 applications:
-- name: smbmktTest
+- name: smbmkt
   memory: 256m
   instances: 1
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
@@ -23,7 +23,7 @@ applications:
     - smbmktdb
     
 
-- name: SAP_SMBAssistantBotTest
+- name: SAP_SMBAssistantBot
   memory: 256m
   path: ./bot/messenger
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
