@@ -110,7 +110,7 @@ $(document).ready(function () {
     /* Fancy restrictive input formatting via jQuery.payment library*/
     $('input[name=cardNumber]').payment('formatCardNumber');
     $('input[name=cardCVC]').payment('formatCardCVC');
-    $('input[name=cardExpiry').payment('formatCardExpiry');
+    $('input[name=cardExpiry]').payment('formatCardExpiry');
 
     /* Form validation using Stripe client-side validation helpers */
     jQuery.validator.addMethod("cardNumber", function (value, element) {
