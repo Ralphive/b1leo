@@ -98,4 +98,4 @@ You will see your backend URL
 For details about app deployment check [Deploying a NodeJS app to SAP Cloud PLatform in this guide](https://github.com/B1SA/B1_SCP_HandsOn/blob/master/HandsOn_SCP_Instructions_v3.pdf)
 
 ## License
-SMB Marketplace Assistant prototype is released under the terms of the MIT license. See [LICENSE](LICENSE] for more information or see https://opensource.org/licenses/MIT.
+SMB Marketplace Assistant prototype is released under the terms of the MIT license. See [LICENSE](LICENSE) for more information or see https://opensource.org/licenses/MIT.
