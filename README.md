@@ -19,13 +19,13 @@
 
 
 ## STEP #1 - Digital Core preparation
-### - Setup the SAP ByD OData API services and Business Analytics
+### Setup the SAP ByD OData API services and Business Analytics
 In order for this application to consume SAP ByD data, it needs to be exposed via webservices. Some data (such as Items) can be accessed via an standard OData API. Others (like inventory) are available via a reporting API called Business Analytics:
 * Import the all the available [models](https://github.com/B1SA/smbmkt/tree/master/models/byd) in the [SAP Businesss ByDesign Odata Services](https://www.youtube.com/watch?v=z6mF_1hFths)
 * Activate the models and take note of the service URL
 * Upload the [report of prices](https://github.com/B1SA/smbmkt/tree/master/models/reports) on SAP Business ByDesign Business Analytics
 
-### Configure the ERP products with pictures
+ - Configure the ERP products with pictures
 In order to find products that are similar to a given input the app needs an "image library" to be used as a comparision by the [SAP Leonardo Similarity Scoring API](https://api.sap.com/shell/discover/contentpackage/SAPLeonardoMLFunctionalServices/api/similarity_scoring_api). In this step we will assign image URL to the ERP items:
 * Upload your pictures to an online storage service such as [imgur](imgur.com)  
 * Fill the url for your products' images in SAP Business ByDesign (Product Data > Materials > General Information > Details text box)
