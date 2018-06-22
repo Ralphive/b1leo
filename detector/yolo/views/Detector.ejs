@@ -1,0 +1,97 @@
+<html>
+
+<head>
+	<title>Shoe Detector Web Demokit</title>
+	<link rel="stylesheet" href="./css/bootstrap.min.css">
+</head>
+<script src="./js/jquery-2.2.4.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
+<script src="./js/detector.js"></script>
+
+<body class="container" id="body">
+	<div id="config" class="row">
+		<div class="input-group col-md-4 mb-3">
+			<div class="input-group-prepend">
+				<label class="input-group-text" for="inputGroupSelect01">Datasets</label>
+			</div>
+			<select class="custom-select" id="dataset">
+				<option value="shoe" selected>Shoe</option>
+				<option value="coco">MS COCO</option>
+			</select>
+		</div>
+
+		<div class="input-group col-md-4 mb-3">
+			<div class="input-group-prepend">
+				<label class="input-group-text" for="inputGroupSelect01">Detection Algorithm</label>
+			</div>
+			<select class="custom-select" id="algorithm">
+				<option value="yolo-v2" selected>Yolo V2</option>
+				<option value="yolo-v3">Yolo V3</option>
+			</select>
+		</div>
+		<div class="col-md-4">
+			<button id="btnInit" type="button" class="btn btn-primary btn-md btn-block">Initilise Detector</button>
+		</div>
+	</div>
+	<div  class="row">
+		<div class="col-md-8 col-xs-12">
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon3">Image Url</span>
+				</div>
+				<input type="text" class="form-control" id="imageUrl" value="" aria-describedby="basic-addon3">
+			</div>
+		</div>
+		<div class="col-md-4 col-xs-12">
+			<button id="btnDetect" type="button" class="btn btn-primary btn-md btn-block">Detect</button>
+		</div>
+	</div>
+	<div class="row">
+		<div id="srcImageContainer" class="card  col-md-6 col-xs-12">
+			<!-- <img id="sourceImage" class="card-img-top" src=".../100px180/?text=Source Image" alt="Source Image"> -->
+		</div>
+		<div id="resultContainer" class="card col-md-6 col-xs-12">
+
+			<!-- <canvas id="resultCanvas">
+				<img id="resultImage" class="card-img-top" src=".../100px180/?text=Detect Result Image" alt="Result Image">
+			</canvas> -->
+
+			<!--<div class="card-body">
+				<h5 class="card-title">Detect Result
+					<small class="text-muted">(Process time: 3.2 second)</small>
+				</h5>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">JSON</span>
+					</div>
+					<textarea id="jsonResult" class="form-control" rows=10 aria-label="JSON"></textarea>
+				</div>
+			</div> -->
+		</div>
+	</div>
+
+	<div class="modal fade" id="operationSuccessModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">
+						<div id="operationSuccessAlert" class="alert alert-success alert-dismissable">
+							<strong>Initializing...Please wait for 30 seconds.</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="operationFailureModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">
+						<div id="operationFailureAlert" class="alert alert-danger alert-dismissable">
+							<strong>An error has occured during Initialization.</strong>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</body>
+
+</html>
