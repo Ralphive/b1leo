@@ -1,12 +1,13 @@
 ---
 applications:
 - name: shoe-detector-yolo
-  memory: 1g
+  memory: 1700m
   instances: 1
   env:
     "WEIGHTS_URL": "https://drive.google.com/file/d/1UDwKu1OSr0XkDLlO3K8Fv4KOLrTeS-ym/edit"
     "WEIGHTS": "./yolov2_shoe.weights"
     "CFG": "./cfg/yolov2_shoe.cfg"
     "NAMES": "./cfg/custom.names"
-    "DETECT_THRES": 0.50
+    "DETECT_THRES": 0.70
     "TEMP_DIR": "./temp/"
+    "IMAGE_BASE_URL": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/image/"

@@ -16,5 +16,8 @@ yolov3-sample.js
 test.js
 
 download_weights.sh
-
+gdown.cookie.temp
 .gitignore
+Shoe Detector.postman_collection.json
+
+old/*

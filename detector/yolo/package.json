@@ -1,7 +1,7 @@
 {
-  "name": "detector-yolo-v3",
+  "name": "shoe-detector-yolo",
   "version": "0.0.1",
-  "description": "Object Detector API of yolo-v3 darknet",
+  "description": "Shoe Detector API of yolo-v3 darknet",
   "main": "app.js",
   "scripts": {
     "test": "node test.js",
@@ -10,6 +10,7 @@
   "keywords": [
     "darknet",
     "yolo",
+    "yolov2",
     "yolov3",
     "object detection",
     "machine learning"
@@ -17,7 +18,7 @@
   "author": "Yatsea Li",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/B1SA/smbmkt"  
+    "url": "https://github.com/B1SA/smbmkt"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -25,6 +26,8 @@
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
+    "image-size": "^0.6.3",
+    "jimp": "^0.2.28",
     "path": "^0.12.7",
     "request": "^2.87.0",
     "shelljs": "^0.8.2"
