@@ -27,9 +27,14 @@ function test() {
 
     //Test#2: Detetc the shoes, the crop with its bouding box
     //testJimp('http://www.bloch.com.au/1530-thickbox_default/s0323-bloch-show-tapper-womens-tap-shoe.jpg');
-
+    //testJimp('https://scontent.fmel5-1.fna.fbcdn.net/v/t1.15752-0/s261x260/36064733_10155855276029164_961626706374819840_n.jpg?_nc_cat=0&oh=a2ef2cb3a09f4100d35cc2e8d1b80bad&oe=5BA97A71');
+    
     //Test#3: DarknetProxy
-    testDarknet();
+    //testDarknet();
+
+    //Test#4: ImagePreprocess
+    //testImagePreProcess('http://www.bloch.com.au/1530-thickbox_default/s0323-bloch-show-tapper-womens-tap-shoe.jpg', 0.8);
+    testImagePreProcess('https://scontent.fmel5-1.fna.fbcdn.net/v/t1.15752-0/s261x260/33037640_10155774331349164_698098460963897344_n.jpg?_nc_cat=0&oh=de513ec7e640d286379cf6b5a00adf5f&oe=5BB9C3DE', 0.8)
 }
 
 function testDarknet() {
@@ -58,6 +63,18 @@ function testDarknet() {
 }
 
 
+function testImagePreProcess(imageUrl, thres) {
+    //http://www.bloch.com.au/1530-thickbox_default/s0323-bloch-show-tapper-womens-tap-shoe.jpg
+    let proxy = new DarknetProxy(WEIGHTS, WEIGHTS_URL, CFG, NAMES);
+    proxy.ImagePreprocess(imageUrl,thres)
+    .then(result => {
+        console.log(JSON.stringify(result));
+    })
+    .catch(error => {
+        console.log(JSON.stringify(error));
+    });
+}
+
 function testJimp(imageUrl) {
     //http://www.bloch.com.au/1530-thickbox_default/s0323-bloch-show-tapper-womens-tap-shoe.jpg
     Jimp.read(imageUrl)
@@ -65,6 +82,7 @@ function testJimp(imageUrl) {
             let req = {};
             req.ImageUrl = imageUrl;
             request({
+                    //url: 'https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Detect',
                     url: 'http://127.0.0.1:58999/Detect',
                     method: "POST",
                     json: req

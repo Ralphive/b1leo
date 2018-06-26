@@ -71,3 +71,7 @@ typings/
 
 .vscode
 
+old/*
+*.jpg
+gdown.cookie.temp
+Shoe Detector.postman_collection.json

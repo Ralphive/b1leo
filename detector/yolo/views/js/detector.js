@@ -107,8 +107,18 @@ $(function () {
 				let h = element.box.h * dh;
 				// let xc = element.box.x * dw;
 				// let yc = element.box.y * dh;
-				//let x = xc - w / 2.0;
+				// let x = xc - w / 2.0;
 				//let y = yc - h /2.0; 
+
+				x = x < 0? 0 : x;
+				//x = x > width? width : x;
+				if((x + w) > width)
+					w = width - x;
+				
+				y = y < 0? 0 : y;
+				y = y > height? height : y;
+				if((y + h) > height)
+					h = height - y;
 				console.log(JSON.stringify(element.box));
 				console.log(`x: ${x}, y: ${y}, w: ${w}, h: ${h}`);
 				ctx.fillStyle = "red";
