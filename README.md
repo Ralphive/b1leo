@@ -19,6 +19,9 @@ Give a name to your app on the [manifest.yml](manifest.yml)
 From the root directory, using the [Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) push your app to the SAP CP Cloud Foundry
 ```sh
 $ cf push
+or
+$ cf push --random-route
+–random-route will avoid name collisions with others that deploy this same app on SCP. You can also choose your own app name by changing the manifest.yml file.
 ```
 Then set the Environment Variables accordingly
 ```sh
