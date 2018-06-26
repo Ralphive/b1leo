@@ -22,21 +22,21 @@ $ cf push
 ```
 Then set the Environment Variables accordingly
 ```sh
-$ cf set-env cfdemosummit18 B1_SERVER_ENV http://<your b1 server>
-$ cf set-env cfdemosummit18 B1_SLPORT_ENV <Service Layer Port>
-$ cf set-env cfdemosummit18 B1_SLPATH_ENV <Service Layer path>
-$ cf set-env cfdemosummit18 B1_USER_ENV <B1 User Name>
-$ cf set-env cfdemosummit18 B1_PASS_ENV <B1 User Password>
-$ cf set-env cfdemosummit18 B1_COMP_ENV <B1 Company DB>
+$ cf set-env b1leo B1_SERVER_ENV http://<your b1 server>
+$ cf set-env b1leo B1_SLPORT_ENV <Service Layer Port>
+$ cf set-env b1leo B1_SLPATH_ENV <Service Layer path>
+$ cf set-env b1leo B1_USER_ENV <B1 User Name>
+$ cf set-env b1leo B1_PASS_ENV <B1 User Password>
+$ cf set-env b1leo B1_COMP_ENV <B1 Company DB>
 ```
 **Example**
 ```sh
-$ cf set-env cfdemosummit18 B1_SERVER_ENV http://hanab1
-$ cf set-env cfdemosummit18 B1_SLPORT_ENV 50001
-$ cf set-env cfdemosummit18 B1_SLPATH_ENV /b1s/v1
-$ cf set-env cfdemosummit18 B1_USER_ENV manager
-$ cf set-env cfdemosummit18 B1_PASS_ENV 1234
-$ cf set-env cfdemosummit18 B1_COMP_ENV SBODEMOUS
+$ cf set-env b1leo B1_SERVER_ENV http://hanab1
+$ cf set-env b1leo B1_SLPORT_ENV 50001
+$ cf set-env b1leo B1_SLPATH_ENV /b1s/v1
+$ cf set-env b1leo B1_USER_ENV manager
+$ cf set-env b1leo B1_PASS_ENV 1234
+$ cf set-env b1leo B1_COMP_ENV SBODEMOUS
 ```
 
 It also requires a [SAP Leonardo API Key](https://api.sap.com/shell/discover/contentpackage/SAPLeonardoMLFunctionalServices/api/document_feature_extraction_api) which you can retrive **AFTER** login into the API Hub and clicking on GET API KEY.
