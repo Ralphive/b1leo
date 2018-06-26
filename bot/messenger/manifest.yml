@@ -3,3 +3,8 @@ applications:
 - name: SAP_SMBAssistantBot
   memory: 256m
   instances: 1
+  env:
+    "PAGE_ACCESS_TOKEN": "EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD"
+    "ENABLE_DETECTOR": true
+    "DETECTOR": "yolo"
+    
