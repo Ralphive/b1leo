@@ -29,6 +29,7 @@ exports.NoMatchedProductReply = 'No matched product found on the market place.';
 exports.GenericAPIErrorReply = 'An error has occurred on invoking api.';
 exports.FBMessageAPIErrorReply = 'An error has occurred on invoking Facebook send message API. Reason:';
 exports.ImageResolutionErrReply = 'Image too resolution high. Max accepted resolution as 1024px x 768px. Please resize the image and try again.';
+exports.NoShoeDetectedReply = 'No shoe detected on the image. Please send me a photo with shoes.';
 exports.GreetingIntent = 'Greeting';
 exports.ThankYouIntent = 'ThankYou';
 exports.GoodByeIntent = 'GoodBye';
