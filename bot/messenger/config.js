@@ -12,6 +12,18 @@ exports.NlpConfidenceThreshhold = 0.80;
 exports.AccessToken = 'EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD';
 exports.VERIFY_TOKEN = "yatsea-SMBAssistantBot";
 exports.Port = 1338;
+
+exports.Detectors = [
+    {
+        "Detector": "yolo",
+        "ImagePreProcessUrl": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/ImagePreprocess"
+    },
+    {
+        "Detector": "tensorflow",
+        "ImagePreProcessUrl": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/ImagePreprocess"
+    }
+]
+
 exports.ListTemplate = {
     "attachment": {
         "type": "template",
@@ -82,4 +94,15 @@ exports.getItemSimilarityUrl = function()
 exports.getFbUserLocationUrl = function(user_id)
 {
     return `https://graph.facebook.com/${user_id}?fields=location&access_token=${exports.AccessToken}`;    
+}
+
+exports.getImagePreprocessUrl = function(detector)
+{
+    for(let i = 0; i < exports.Detectors.length; i++) {
+        let entry = exports.Detectors[i];
+        if(entry.Detector === detector)
+            return entry.ImagePreProcessUrl;
+    }
+    //default image preprocessor as yolo
+    return exports.Detectors[0].ImagePreProcessUrl;
 }

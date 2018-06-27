@@ -38,6 +38,9 @@ const
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || config.AccessToken;
 const PORT = process.env.PORT || config.Port;
+const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || false;
+const DETECTOR = process.env.DETECTOR || 'yolo';
+
 console.log('app started');
 app.use('/web', express.static(path.join(__dirname, './views')));
 
@@ -199,13 +202,11 @@ app.get('/web/ShoppingCart', (req, res) => {
 });
 
 app.get('/web/DeliverySetting', (req, res) => {
-    res.render(path.join(__dirname, './views/DeliverySetting'), {
-    });
+    res.render(path.join(__dirname, './views/DeliverySetting'), {});
 });
 
 app.get('/web/PaymentSetting', (req, res) => {
-    res.render(path.join(__dirname, './views/PaymentSetting'), {
-    });
+    res.render(path.join(__dirname, './views/PaymentSetting'), {});
 });
 
 // Accepts GET requests at the /webhook endpoint
@@ -270,37 +271,64 @@ function handleIntent(sender_psid, intent) {
 }
 
 function handleImageMessage(sender_psid, image_url) {
+    try {
+        //If the detector is enabled for image pre-processing.
+        if (ENABLE_DETECTOR) {
+            let request_body = {
+                'ImageUrl': image_url
+            };
+            request({
+                    url: config.getImagePreprocessUrl(DETECTOR),
+                    method: "POST",
+                    json: request_body
+                },
+                function (error, resp, body) {
+                    if(error)
+                    {
+                        console.error(error);
+                        console.log(resp);
+                    }
+                    console.log(body);
+                    //no shoe detected
+                    if (body && body.ReturnCode && body.ReturnCode === -99) {
+                        console.log('No shoe detected');
+                        let response = intentHelper.GenerateTextResponse(i18n.NoShoeDetectedReply);
+                        callSendAPI(sender_psid, response);
+                    } else {
+                        //shoe detected, pro-process the image and send the cropped image for item similarity
+                        handleItemSimilarity(sender_psid, image_url);
+                    }
+                }
+            );
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function handleItemSimilarity(sender_psid, image_url) {
     let response;
-    //console.log(JSON.stringify(image));
     let request_body = {
-        //'url': 'https://assets.academy.com/mgen/56/20039256.jpg'
-        //'url': './images/shoe_test.jpg'
         'url': image_url
     };
-    axios.post(config.getItemSimilarityUrl(), request_body, {
-            headers: {
-                'Content-Type': 'application/json',
-                //'withCredentials': true
+    request({
+            //url: 'https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Detect',
+            url: 'https://smbmkt.cfapps.eu10.hana.ondemand.com/SimilarItems',
+            method: "POST",
+            json: request_body
+        },
+        function (error, resp, body) {
+            if (error) {
+                console.log('error caught in handleItemSimilarity!');
+                console.error(error);
+                //At current stage, only Internal Server Problem-image resolution too high falling into this.
+                response = intentHelper.GenerateTextResponse(i18n.ImageResolutionErrReply);
+                //response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
+                callSendAPI(sender_psid, response);
+                return;
             }
-        })
-        .then(res => {
-            // console.info('status %s', res.status);
-            // console.log(JSON.stringify(res.data));
-            // if (res.status === 500) {
-            //     if(res.data && res.data.message && res.data.message.includes('Extract vector'))
-            //     {
-            //         console.log('Image resolution too high.');
-            //         response = intentHelper.GenerateTextResponse(i18n.ImageResolutionErrReply);
-            //     }
-            //     else{
-            //         response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
-            //     }
-                
-            //     callSendAPI(sender_psid, response);
-            //     return;
-            // }
-            
-            let result = util.FormatItemResult(res.data);
+            console.log(body);
+            let result = util.FormatItemResult(body);
             console.log(JSON.stringify(result));
 
             if (result && result.length === 0) {
@@ -314,14 +342,14 @@ function handleImageMessage(sender_psid, image_url) {
 
                 entry.title = `${product.productid}(${product.score})`;
                 entry.subtitle =
-`${product.name}
+                    `${product.name}
 Price: ${product.price}${product.priceCurrency}
 In Stock: ${product.inventoryLevel}`;
                 entry.image_url = product.image;
 
                 let data = {};
                 data.selectedProduct = product,
-                data.similarProducts = [];
+                    data.similarProducts = [];
                 let productUrl = config.getProductUrl(util.encodeData(data));
                 entry.buttons[0].url = productUrl;
                 console.log(`add2chart url
@@ -334,14 +362,6 @@ ${productUrl}`);
                 console.log(response.attachment.payload.buttons[0].url);
             }
 
-            callSendAPI(sender_psid, response);
-        })
-        .catch(err => {
-            console.log('error caught in handleImageMessage!');
-            console.error(err);
-            //At current stage, only Internal Server Problem-image resolution too high falling into this.
-            response = intentHelper.GenerateTextResponse(i18n.ImageResolutionErrReply);
-            //response = intentHelper.GenerateTextResponse(i18n.GenericAPIErrorReply);
             callSendAPI(sender_psid, response);
         });
 }
@@ -539,8 +559,7 @@ function callSendAPI(sender_psid, response) {
             console.log('HTTP Response Status Code:', res && res.statusCode);
             console.log('Body:', JSON.stringify(body));
             console.error("Unable to send message:" + err);
-            if(body && body.error && body.error.message)
-            {
+            if (body && body.error && body.error.message) {
                 let msg = `${i18n.FBMessageAPIErrorReply} ${body.error.message}`;
                 callSendAPI(sender_psid, intentHelper.GenerateTextResponse(msg));
             }
