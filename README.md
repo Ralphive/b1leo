@@ -48,7 +48,7 @@ $ cf login
 Create the Redis and PostgreSQL services
 ```
 cf create-service redis v3.0-dev cachedb
-cf create-service postgresql v9.6-dev smbmktdb
+cf create-service postgresql v9.6-dev itemsdb
 ```
 
 ### Deploy the app's microservices

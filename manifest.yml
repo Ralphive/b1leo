@@ -20,7 +20,7 @@ applications:
 
   services:
     - cachedb
-    - smbmktdb
+    - itemsdb
     
 
 - name: SAP_SMBAssistantBot
