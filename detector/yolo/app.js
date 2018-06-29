@@ -6,9 +6,6 @@ const path = require('path');
 const DarknetProxy = require('./DarknetProxy');
 const Jimp = require('jimp');
 
-const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/image/';
-const threshold = process.env.DETECT_THRES || 0.80;
-const tempDir = process.env.TEMP_DIR || './temp/';
 const PORT = process.env.PORT || 58999;
 let WEIGHTS = process.env.WEIGHTS || './yolov2_shoe.weights';
 let WEIGHTS_URL = process.env.WEIGHTS_URL || 'https://drive.google.com/file/d/1UDwKu1OSr0XkDLlO3K8Fv4KOLrTeS-ym/edit';
@@ -100,13 +97,17 @@ app.post('/Detect', (req, res) => {
 app.post('/ImagePreprocess', (req, res) => {
     if (req.body && req.body.ImageUrl) {
         darknetProxy.ImagePreprocess(req.body.ImageUrl, req.body.Threshold)
-        .then(result => {
-            res.status(200).json(result);
-        })
-        .catch(error => {
-            res.status(500).json(error);
-        });
-        
+            .then(result => {
+                if (req.body.Id) {
+                    result.Id = req.body.Id;
+                    result.OrginalURL = req.body.ImageUrl;
+                }
+                res.status(200).json(result);
+            })
+            .catch(error => {
+                res.status(500).json(error);
+            });
+
         // darknetProxy.Detect(req.body.ImageUrl, req.body.Threshold)
         //     .then(result => {
         //         console.log(result);
@@ -120,7 +121,7 @@ app.post('/ImagePreprocess', (req, res) => {
         //             res.status(200).json(imageRes);
         //             return;
         //         }
-                
+
         //         //let cropImageName = util.GenerateImageFileName();
         //         let cropImageName = result[0].imagePath;
         //         Jimp.read(req.body.ImageUrl)
@@ -149,5 +150,5 @@ app.post('/ImagePreprocess', (req, res) => {
 });
 
 app.get('/image/:fileName', function (req, res) {
-    res.sendFile('temp/'+req.params.fileName);
+    res.sendFile('temp/' + req.params.fileName);
 });
