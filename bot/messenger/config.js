@@ -20,7 +20,7 @@ exports.Detectors = [
     },
     {
         "Detector": "tensorflow",
-        "ImagePreProcessUrl": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/ImagePreprocess"
+        "ImagePreProcessUrl": "https://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/ImagePreprocess"
     }
 ]
 
