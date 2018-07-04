@@ -1,0 +1,38 @@
+[
+    {
+        "dataset": "coco",
+        "algorithm": "ssd_mobilenet_v2",
+        "model": "ssd_mobilenet_v2_coco_2018_03_29",
+        "cfg": "",
+        "names": "mscoco_label_map.pbtxt",
+        "weights": "frozen_inference_graph.pb",
+        "classNumber": 90,
+        "downloadType": "direct",
+        "fileType": "tar",
+        "weightsUrl": "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz"
+    },
+    {
+        "dataset": "coco",
+        "algorithm": "ssdlite_mobilenet_v2",
+        "model": "ssdlite_mobilenet_v2_coco_2018_05_09",
+        "cfg": "",
+        "names": "mscoco_label_map.pbtxt",
+        "weights": "frozen_inference_graph.pb",
+        "classNumber": 90,
+        "downloadType": "direct",
+        "fileType": "tar",
+        "weightsUrl": "http://download.tensorflow.org/models/object_detection/ssdlite_mobilenet_v2_coco_2018_05_09.tar.gz"
+    },
+    {
+        "dataset": "shoe",
+        "algorithm": "ssdlite_mobilenet_v2",
+        "model": "ssdlite_mobilenet_v2_shoe",
+        "cfg": "",
+        "names": "shoe_lable_map.pbtxt",
+        "weights": "frozen_inference_graph.pb",
+        "classNumber": 1,
+        "downloadType": "google drive",
+        "fileType": "tar",
+        "weightsUrl": "1ZNVzlumv0MPHiWp_Qmnv7hcL5uwz9m_5"
+    }
+]
