@@ -35,12 +35,18 @@ $(function () {
 		let startTime = Date.now();
 		console.log(`start on: ${startTime}`);
 		$.ajax({
-				url: '../Detect',
+				//url: '../Detect',
+				url: 'https://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/Detect',
 				method: 'POST',
 				data: JSON.stringify(request),
 				contentType: 'application/json',
 			}).done(function (data) {
 				let processTimeinSec = (Date.now() - startTime) / 1000;
+				try {
+					data = JSON.parse(data)
+				} catch (error) {
+					console.error(error);
+				}
 				displayResult(imageUrl, data, processTimeinSec);
 			})
 			.fail(function (xhr, status, error) {
