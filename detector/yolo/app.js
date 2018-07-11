@@ -1,3 +1,16 @@
+/********************************************************************************
+A NodeJS RESTful wrapper of turning yolo object detection into web service with 
+Express on SAP Cloud Platform,Clouod Foundry
+
+The source code is under MIT license. Please kindly check the LICENSE.
+Here is to highlight that THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF 
+ANY KIND, EXPRESS ORIMPLIED. Therefore no support available.
+
+Created on: May 20 2018
+Author: Yatsea Li
+
+All rights reserved by SAP SE
+*********************************************************************************/
 'use strict';
 const express = require('express');
 const body_parser = require('body-parser');
