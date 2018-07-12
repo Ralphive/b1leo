@@ -1,10 +1,10 @@
-# Turning Tensorflow Object Detection into RESTful Web Service
+# Turning Tensorflow Object Detection API into Web Services on SAP Cloud Platform, Cloud Foundry
 ## Overview
 A generic RESTful API Wrapper of turning [TensorFlow Object API](https://github.com/tensorflow/models/tree/master/research/object_detection) into a web service for object detection with Flask, which can be deployed on SAP Cloud Platform, Cloud Foundry or on-premise environment. In addition, a generic object oriented object_detector is implemeted for general tensorflow frozen inference graph for object detection.
 
 ## API endpoints:
 ### POST /Initialize 
-Reinitialize and load the given tensorflow frozen interence graph for object detection.
+Reinitialize and load the given tensorflow frozen interence graph on the fly for object detection.
 
 #### Request Sample:
 ```json
@@ -79,8 +79,7 @@ Detect the objects and crop the bounding box for the detected object with highes
 }
 ```
 #### Response Sample:
-
--Object detected
++ Object detected
 ```json
 {
     "Confidence": 0.9108547568321228,
@@ -89,10 +88,9 @@ Detect the objects and crop the bounding box for the detected object with highes
     "ReturnCode": 0
 }
 ```
--No object detected
++ No object detected
 ```json
 {
-
     "CroppedImageUrl": "",
     "ReturnCode": -99,
     "Message": "No object detected"
@@ -140,15 +138,13 @@ There are 3 importants files:
     }
 ```
 #### Important fields:
--model: must match the downloaded tar.gz file. For example, 
+- model: must match the downloaded tar.gz file. For example, 
 the downloaded model file as ssdlite_mobilenet_v2_coco_2018_05_09.tar.gz, 
 then its model must be ssdlite_mobilenet_v2_coco_2018_05_09, which is used to
 identify its coresponding setting
-
--weightsUrl: The url to download the frozen inference graph. 
+- weightsUrl: The url to download the frozen inference graph. 
 If the download type google drive, then it is the id of sharable google.
-
--fileType: only support "tar" as .tar or .tar.gz which will decide the extraction strategy
+- fileType: only support "tar" as .tar or .tar.gz which will decide the extraction strategy
 
 #### The default models including:
 1).ssd_mobilenet_v2_coco_2018_03_29: official pretrained ms coco with ssd mobilenet v2 
@@ -163,11 +159,11 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 2. [Optional] Configure the target model to be used. The default model is my customed trained model ssdlite_mobilenet_v2_shoe for shoe detection
 
-+ In Cloud Foundry environment: Change the MODEL_NAME field in manifest.yml
+1). In Cloud Foundry environment: Change the MODEL_NAME field in manifest.yml
 ```yml
 "MODEL_NAME": "ssdlite_mobilenet_v2_shoe"
 ```
-+ In local server environment:
+2). In local server environment:
 ```sh
 bash: export MODEL_NAME <YOUR_TARGET_MODEL>
 csh:  setenv MODEL_NAME <YOUR_TARGET_MODEL>
@@ -178,7 +174,7 @@ model = os.getenv('MODEL_NAME') or 'ssdlite_mobilenet_v2_shoe'
 ```
 
 ### 3.Deployment
-#### 1).In Cloud Foundry environment:
+#### 1). In Cloud Foundry environment:
 under the directory detector/tensorflow, run the command with cf cli: 
 ```sh
 $ cf push
@@ -198,7 +194,7 @@ or manual install the required packages in python:
 - requests
 
 ### 4.Run:
-#### 1).In Cloud Foundry environment:
+#### 1). In Cloud Foundry environment:
 The app will automatically started on Cloud Foundry once deployed
 
 #### 2). On local on-premise deployment
