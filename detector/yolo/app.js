@@ -162,6 +162,6 @@ app.post('/ImagePreprocess', (req, res) => {
     }
 });
 
-app.get('/image/:fileName', function (req, res) {
-    res.sendFile('temp/' + req.params.fileName);
+app.get('/Images/:fileName', function (req, res) {
+    res.sendFile(path.join(__dirname,'temp', req.params.fileName));
 });
