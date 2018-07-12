@@ -10,4 +10,4 @@ applications:
     "NAMES": "./cfg/custom.names"
     "DETECT_THRES": 0.70
     "TEMP_DIR": "./temp/"
-    "IMAGE_BASE_URL": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/image/"
+    "IMAGE_BASE_URL": "https://xxx-shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Images/"

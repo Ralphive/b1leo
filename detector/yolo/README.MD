@@ -88,7 +88,7 @@ Detect the objects and crop the bounding box for the detected object with highes
 ```json
 {
     "Confidence": 0.9108547568321228,
-    "CroppedImageUrl": "http://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/Images/23c6f8f4-913a-48ed-994f-e02d33a30881.jpg",
+    "CroppedImageUrl": "http://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Images/23c6f8f4-913a-48ed-994f-e02d33a30881.jpg",
     "Object": "shoe",
     "ReturnCode": 0
 }
@@ -165,7 +165,7 @@ Change the environment variable below in manifest.yml
     "NAMES": "./cfg/custom.names"
     "DETECT_THRES": 0.70
     "TEMP_DIR": "./temp/"
-    "IMAGE_BASE_URL": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/image/"
+    "IMAGE_BASE_URL": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Images/"
 ```
 2). In local server environment:
 ```sh
@@ -186,8 +186,12 @@ let NAMES = process.env.NAMES || './cfg/custom.names';
 #### 1).Deploy to Cloud Foundry environment
 Under the directory detector/tensorflow, 
 
-i.Replace xxx with your company name space on the app name xxx-shoe-detector-yolo in manifest.yml
-
+i.Replace xxx with your company name space on the app name xxx-shoe-detector-yolo and the IMAGE_BASE_URL in manifest.yml.
+```yml
+- name: xxx-shoe-detector-yolo
+    env:
+        "IMAGE_BASE_URL": "https://xxx-shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/image/"
+```
 ii.Run the command with cf cli: 
 ```sh
 $ cf push

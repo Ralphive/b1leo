@@ -22,7 +22,7 @@ const Jimp = require('jimp');
 const sizeOf = require('image-size');
 
 const threshold = process.env.DETECT_THRES || 0.70;
-const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/image/';
+const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/Images/';
 
 module.exports = class DarknetProxy {
 
