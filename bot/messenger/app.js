@@ -38,8 +38,8 @@ const
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || config.AccessToken;
 const PORT = process.env.PORT || config.Port;
-const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || false;
-const DETECTOR = process.env.DETECTOR || 'yolo';
+const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || true;
+const DETECTOR = process.env.DETECTOR || 'tensorflow';
 
 console.log('app started');
 app.use('/web', express.static(path.join(__dirname, './views')));
