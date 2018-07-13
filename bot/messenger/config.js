@@ -103,6 +103,6 @@ exports.getImagePreprocessUrl = function(detector)
         if(entry.Detector === detector)
             return entry.ImagePreProcessUrl;
     }
-    //default image preprocessor as yolo
-    return exports.Detectors[0].ImagePreProcessUrl;
+    //default image preprocessor as tensorflow
+    return exports.Detectors[1].ImagePreProcessUrl;
 }
