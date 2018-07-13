@@ -117,7 +117,7 @@ module.exports = class DarknetProxy {
      * Test function.
      */
     Test() {
-        let result = this.darknet.detect('./temp/shoe.jpg');
+        let result = this.darknet.detect('./images/shoe.jpg');
         console.log(result);
         return result;
     }
