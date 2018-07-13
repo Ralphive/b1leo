@@ -1,6 +1,7 @@
 applications:
-- name: SAP_SMBAssistantBot
+- name: XXX_SMBAssistantBot
   memory: 256m
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
   instances: 1
   env:
     "PAGE_ACCESS_TOKEN": "!!!Important: Please place your own page access token for the facebook messenger here!!!"
