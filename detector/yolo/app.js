@@ -27,7 +27,7 @@ let NAMES = process.env.NAMES || './cfg/custom.names';
 //global instance of darknet proxy
 let darknetProxy = new DarknetProxy(WEIGHTS, WEIGHTS_URL, CFG, NAMES);
 
-app.use('/Images', express.static(path.join(__dirname, './temp')));
+app.use('/Images', express.static(path.join(__dirname, './images')));
 app.use('/web', express.static(path.join(__dirname, './views')));
 app.set('view engine', 'ejs');
 app.listen(PORT, () => console.log(`YOLO image pre-processing service is listening at http://127.0.0.1:${PORT}/`));

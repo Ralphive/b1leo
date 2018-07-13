@@ -164,7 +164,6 @@ Change the environment variable below in manifest.yml
     "CFG": "./cfg/yolov2_shoe.cfg"
     "NAMES": "./cfg/custom.names"
     "DETECT_THRES": 0.70
-    "TEMP_DIR": "./temp/"
     "IMAGE_BASE_URL": "https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Images/"
 ```
 2). In local server environment:

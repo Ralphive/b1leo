@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const request = require('request');
 
-const tempDir = process.env.TEMP_DIR || './temp/';
+const imagesDir = './images/';
 
 /**
  * Download image file with the given uri, and save to the given FilePath
@@ -74,7 +74,7 @@ exports.GenerateImageFileName = function() {
         ss = '0' + ss;
     }
     //return  
-    let imageFileName = path.join(tempDir, `${yyyy}_${mm}_${dd}_${ss}_${ms}.jpg`);
+    let imageFileName = path.join(imagesDir, `${yyyy}_${mm}_${dd}_${ss}_${ms}.jpg`);
     console.log(imageFileName);
     return imageFileName;
 }
