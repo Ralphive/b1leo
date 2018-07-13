@@ -3,7 +3,7 @@ applications:
   memory: 256m
   instances: 1
   env:
-    "PAGE_ACCESS_TOKEN": "EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD"
+    "PAGE_ACCESS_TOKEN": "!!!Important: Please place your own page access token for the facebook messenger here!!!"
     "ENABLE_DETECTOR": true
     "DETECTOR": "tensorflow"
     
