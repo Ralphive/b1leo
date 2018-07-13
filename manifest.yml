@@ -22,9 +22,20 @@ applications:
     - cachedb
     - itemsdb
     
-
-- name: SAP_SMBAssistantBot
+- name: XXX_SMBAssistantBot
   memory: 256m
   path: ./bot/messenger
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
   instances: 1
+    "PAGE_ACCESS_TOKEN": "!!!Important: Please place your own page access token for the facebook messenger here!!!"
+    "ENABLE_DETECTOR": true
+    "DETECTOR": "tensorflow"
+
+- name: xxx-shoe-detector-tf
+  memory: 700MB
+  disk_quota: 1G
+  buildpack: python_buildpack
+  command: python server.py
+  env:
+    "MODEL_NAME": "ssdlite_mobilenet_v2_shoe"
+    "DETECT_THRES": 0.70
