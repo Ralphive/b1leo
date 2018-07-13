@@ -1,4 +1,42 @@
 $(function () {
+	/**
+	 * TODO: Please update the BaseUrl for the target tensorflow detector
+	 * which is deployed through code /smbmkt/detector/tensorflow
+	 * It is "../" for yolo as the demokit is running from yolo detector
+	 */
+	const DETECTORS = [
+		{
+			"Detector": "yolo",
+			"BaseUrl": "../"
+		},
+		{
+			"Detector": "tensorflow",
+			"BaseUrl": "https://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/"
+		}
+	];
+	const INITIALIZE_ENDPOINT = 'Initialize';
+	const DETECT_ENDPOINT = 'Detect';
+
+	//detetcor global variable:
+	//By default, we use yolo detector for the demokit.
+	let detector = 'yolo'; 
+
+	/**
+	 * Get the base url of the detector with the given detector name
+	 * d: The input detector name, which could be "yolo" or "tensorflow"
+	 */
+	function getDetectorBaseUrl(d){
+		let len = DETECTORS.length;
+		for(let i = 0; i < len; i++)
+		{
+			if (DETECTORS[i].Detector === d)
+				return DETECTORS[i].BaseUrl;
+		}
+		
+		//by default, return the base url of yolo detector, 
+		//as the demokit is running from yolo detector
+		return DETECTORS[0].BaseUrl;
+	}
 
 	/**
 	 * Button click handler for Initialize button.
@@ -6,11 +44,29 @@ $(function () {
 	 */
 	$('#btnInit').click(function () {
 		let dataset = $("#dataset option:selected").val();
-		let algorithm = $("#algorithm option:selected").val();		
+		let algorithm = $("#algorithm option:selected").val();	
+		let body = {};
+		
+		if(algorithm.startsWith('tf')){
+			//using tensforflow detector
+			//TODO: [Optional]If you have add your custom dataset, please add the mapping
+			//between dataset and model for the demokit, otherwise just ignore this todo.
+			detector = 'tensorflow';
+			let model = 'ssdlite_mobilenet_v2_shoe';
+			if(dataset === 'coco')
+				model = 'ssdlite_mobilenet_v2_coco_2018_05_09';
+			body.model = model;
+		} else {
+			body.dataset = dataset;
+			body.algorithm = algorithm;
+		}
+
+		let url = `${getDetectorBaseUrl(detector)}${INITIALIZE_ENDPOINT}`;
 		$.ajax({
-				url: `../Initialize?dataset=${dataset}&algorithm=${algorithm}`,
-				method: 'GET',
+				url: url,
+				method: 'POST',
 				contentType: 'application/json',
+				data: JSON.stringify(body)
 			}).done(function (data) {
 				$('#operationSuccessModal').modal('show');
 			})
@@ -31,22 +87,19 @@ $(function () {
 		$('#resultContainer').empty();
 		$('#srcImageContainer').empty();
 		$('#srcImageContainer').append(`<img id="sourceImage" class="card-img-top" src="${imageUrl}" alt="Source Image">`);
-		
+
+		let url = `${getDetectorBaseUrl(detector)}${DETECT_ENDPOINT}`;
 		let startTime = Date.now();
 		console.log(`start on: ${startTime}`);
 		$.ajax({
-				url: '../Detect',
+				url: url,
+				//url: '../Detect'
 				//url: 'https://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/Detect',
 				method: 'POST',
 				data: JSON.stringify(request),
 				contentType: 'application/json',
 			}).done(function (data) {
 				let processTimeinSec = (Date.now() - startTime) / 1000;
-				try {
-					data = JSON.parse(data)
-				} catch (error) {
-					console.error(error);
-				}
 				displayResult(imageUrl, data, processTimeinSec);
 			})
 			.fail(function (xhr, status, error) {
@@ -111,10 +164,6 @@ $(function () {
 				let y = element.box.y * dh;
 				let w = element.box.w * dw;
 				let h = element.box.h * dh;
-				// let xc = element.box.x * dw;
-				// let yc = element.box.y * dh;
-				// let x = xc - w / 2.0;
-				//let y = yc - h /2.0; 
 
 				x = x < 0? 0 : x;
 				//x = x > width? width : x;
@@ -147,17 +196,4 @@ $(function () {
 	{
 		return `${(dec * 100).toFixed(2)}%`;
 	}
-	// 	$.post("../Detect", request, 'application/json', function (data) {
-	// 			alert(JSON.stringify(data, undefined, 4));
-	// 		})
-	// 		.done(function () {
-	// 			alert("second success");
-	// 		})
-	// 		.fail(function () {
-	// 			alert("error");
-	// 		})
-	// 		.always(function () {
-	// 			alert("finished");
-	// 		});
-	// });
 });

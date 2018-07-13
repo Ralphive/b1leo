@@ -15,6 +15,7 @@
 				<label class="input-group-text" for="inputGroupSelect01">Datasets</label>
 			</div>
 			<select class="custom-select" id="dataset">
+				<!--Please add your own dataset here-->
 				<option value="shoe" selected>Shoe</option>
 				<option value="coco">MS COCO</option>
 			</select>
@@ -27,6 +28,7 @@
 			<select class="custom-select" id="algorithm">
 				<option value="yolo-v2" selected>Yolo V2</option>
 				<option value="yolo-v3">Yolo V3</option>
+				<option value="tf-ssdlite-v2">SSDLite V2 on Tensorflow</option>
 			</select>
 		</div>
 		<div class="col-md-4">
@@ -51,7 +53,7 @@
 			<!-- <img id="sourceImage" class="card-img-top" src=".../100px180/?text=Source Image" alt="Source Image"> -->
 		</div>
 		<div id="resultContainer" class="card col-md-6 col-xs-12">
-
+			<!--The following content will be loaded on the fly when Detect button is click-->
 			<!-- <canvas id="resultCanvas">
 				<img id="resultImage" class="card-img-top" src=".../100px180/?text=Detect Result Image" alt="Result Image">
 			</canvas> -->
