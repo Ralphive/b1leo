@@ -36,7 +36,7 @@ $ cf set-env b1leo B1_COMP_ENV <B1 Company DB>
 ```sh
 $ cf set-env b1leo B1_SERVER_ENV http://hanab1
 $ cf set-env b1leo B1_SLPORT_ENV 50001
-$ cf set-env b1leo B1_SLPATH_ENV /b1s/v1
+$ cf set-env b1leo B1_SLPATH_ENV /b1s/v1/
 $ cf set-env b1leo B1_USER_ENV manager
 $ cf set-env b1leo B1_PASS_ENV 1234
 $ cf set-env b1leo B1_COMP_ENV SBODEMOUS
@@ -44,7 +44,7 @@ $ cf set-env b1leo B1_COMP_ENV SBODEMOUS
 
 It also requires a [SAP Leonardo API Key](https://api.sap.com/shell/discover/contentpackage/SAPLeonardoMLFunctionalServices/api/document_feature_extraction_api) which you can retrive **AFTER** login into the API Hub and clicking on GET API KEY.
 ```sh
-$ cf set-env cfdemosummit18 LEO_API_KEY <YOUR API KEY>
+$ cf set-env <your app name> LEO_API_KEY <YOUR API KEY>
 ```
 
 Restart your application (so it can read the new environment variables)
