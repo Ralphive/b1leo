@@ -65,8 +65,12 @@ app = Flask(__name__)
 port = int(os.getenv('PORT', 58888))
 model = os.getenv('MODEL_NAME') or 'ssdlite_mobilenet_v2_shoe'
 detector = object_detector(model)
-DETECT_THRESHOLD = os.getenv('DETECT_THRES') or 0.70
-
+DETECT_THRESHOLD = os.getenv('DETECT_THRES') 
+if DETECT_THRESHOLD is None:
+    DETECT_THRESHOLD = 0.70
+else:
+    DETECT_THRESHOLD = float(DETECT_THRESHOLD)
+    
 # for CORS
 @app.after_request
 def after_request(response):
