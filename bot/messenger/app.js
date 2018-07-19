@@ -3,11 +3,13 @@
  *
  * To run this code, you must do the following:
  * 1. Follow the facebook developer manual to create a messenger bot with message and user_location service https://developers.facebook.com/docs/messenger-platform/getting-started
- * 2. Update the VERIFY_TOKEN for your messenger bot in config.js, which will be used on registered the web hook to fb messenger
- * 3. Update the PAGE_ACCESS_TOKEN for your messenger bot in config.js
+ * 2. Update the VERIFY_TOKEN for your messenger bot in manifest.yml , which will be used on registered the web hook to fb messenger
+ * 3. Update the PAGE_ACCESS_TOKEN for your messenger bot in manifest.yml
+ * 3. Update the SMBMKT_BACKEND_URL for your messenger bot in manifest.yml
  * 4. Deploy this code to a server running Node.js
  * Option 1: Deploy to SAP Cloud Platform, Cloud Foundry
  * Step 1: run 'cf login' to login SAP Cloud Platform, Cloud Foundry wity your credential
+ * 
  * Step 2: run 'cf push' to deploy the app to SAP Cloud Platform, Cloud Foundry.
  * As result, you can find out the urls of your messenger bot.
  * for example: https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com (Please add https:// at the beginning of url)
@@ -36,22 +38,75 @@ const
     intentHelper = require('./IntentHelper'),
     axios = require('axios');
 
-const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || config.AccessToken;
-const PORT = process.env.PORT || config.Port;
-const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || true;
-const DETECTOR = process.env.DETECTOR || 'tensorflow';
+//Check if the mandaory enviroment variables below are configured: 
+//PAGE_ACCESS_TOKEN, VERIFY_TOKEN, SMBMKT_BACKEND_URL, IMAGE_PRE_PROCESS_URL
+const EXIT_ON_MISSING_CONFIG =  process.env.EXIT_ON_MISSING_CONFIG || false;
+console.log('Checking mandatory environment variables for SMB Market Place Assistant Bot');
+let checkConfig = config.CheckConfiguration();
+if (checkConfig === false) {
+    if (EXIT_ON_MISSING_CONFIG) {
+        console.error('SMB Market Place Assistant Bot not started due to missing some mandatory environment variables configuration.');
+        process.exit(1);
+    }
+    else{
+        console.log(`SMB Market Place Assistant Bot started, but it will not function due to the missing configuration above. 
+Please configure the mandatory configurations, and start again.`);
+    }
+}
 
-console.log('app started');
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || config.AccessToken;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || config.VERIFY_TOKEN;
+const PORT = process.env.PORT || config.Port;
+const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || false;
+const DETECTOR = process.env.DETECTOR || 'tensorflow';
+const IMAGE_PRE_PROCESS_URL = config.getImagePreprocessUrl(DETECTOR);
+const ITEM_SIMILARITY_END_POINT = `${process.env.SMBMKT_BACKEND_URL}/SimilarItems`;
+
+console.log('SMBs Market Place Assistant Bot started');
 app.use('/web', express.static(path.join(__dirname, './views')));
 
 app.set('view engine', 'ejs');
 // Sets server port and logs message on success
-app.listen(PORT, () => console.log(`SMBs Market Place Assistant webhook is listening at https://127.0.0.1:${PORT}/webhook`));
+let listener = app.listen(PORT, () => console.log(`SMBs Market Place Assistant Bot webhook is listening at http://127.0.0.1:${PORT}/webhook`));
+// console.log(listener.address().address);
+// console.log(listener.address().port);
+
+// Accepts GET requests at the /webhook endpoint
+app.get('/webhook', (req, res) => {
+    // Parse params from the webhook verification request
+    let mode = req.query['hub.mode'];
+    let token = req.query['hub.verify_token'];
+    let challenge = req.query['hub.challenge'];
+
+    // Check if a token and mode were sent
+    if (mode && token) {
+
+        // Check the mode and token sent are correct
+        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            // Respond with 200 OK and challenge token from the request
+            console.log('WEBHOOK_VERIFIED');
+            res.status(200).send(challenge);
+        } else {
+            // Responds with '403 Forbidden' if verify tokens do not match
+            res.sendStatus(403);
+        }
+    }
+});
 
 // Accepts POST requests at /webhook endpoint
 app.post('/webhook', (req, res) => {
     // Parse the request body from the POST
     let body = req.body;
+    
+    //Refresh the bot urls in the configuration. One-time job.
+    //as the view product page is hosted on the bot, which need the bot root url to
+    //build the view product url.
+    if(config.RefreshBotUrl)
+    {
+        config.smbmkt_bot_root_url = `${req.protocol}://${req.get('host')}`;
+        config.ViewProductUrl = `${config.smbmkt_bot_root_url}/web/Products?data=`;
+        config.RefreshBotUrl = false;
+    }
 
     // Check the webhook event is from a Page subscription
     if (body.object === 'page') {
@@ -83,6 +138,10 @@ app.post('/webhook', (req, res) => {
 
 });
 
+/**
+ * View Products Handler
+ * Parse the products info from the url para, and rendering on the ejs page.
+ */
 app.get('/web/Products', (req, res) => {
 
     if (!req.query.data) {
@@ -113,6 +172,10 @@ app.get('/web/Products', (req, res) => {
     });
 });
 
+/**
+ * Check Store page handler
+ * Show the store in google map.
+ */
 app.get('/web/Store', (req, res) => {
 
     /* if (!req.query.data) {
@@ -176,6 +239,9 @@ app.get('/web/Store', (req, res) => {
     //   });; 
 });
 
+/**
+ * Menu Shopping Cart handler
+ */
 app.get('/web/ShoppingCart', (req, res) => {
     /* 
     if (!req.query.data) {
@@ -201,36 +267,18 @@ app.get('/web/ShoppingCart', (req, res) => {
     });
 });
 
+/**
+ * Menu Settings->Delivery Setting Handler
+ */
 app.get('/web/DeliverySetting', (req, res) => {
     res.render(path.join(__dirname, './views/DeliverySetting'), {});
 });
 
+/**
+ * Menu Settings->Payment Setting Handler
+ */
 app.get('/web/PaymentSetting', (req, res) => {
     res.render(path.join(__dirname, './views/PaymentSetting'), {});
-});
-
-// Accepts GET requests at the /webhook endpoint
-app.get('/webhook', (req, res) => {
-    // Parse params from the webhook verification request
-    let mode = req.query['hub.mode'];
-    let token = req.query['hub.verify_token'];
-    let challenge = req.query['hub.challenge'];
-
-    // Check if a token and mode were sent
-    if (mode && token) {
-
-        // Check the mode and token sent are correct
-        if (mode === 'subscribe' && token === config.VERIFY_TOKEN) {
-
-            // Respond with 200 OK and challenge token from the request
-            console.log('WEBHOOK_VERIFIED');
-            res.status(200).send(challenge);
-
-        } else {
-            // Responds with '403 Forbidden' if verify tokens do not match
-            res.sendStatus(403);
-        }
-    }
 });
 
 function isGreeting(text) {
@@ -278,13 +326,13 @@ function handleImageMessage(sender_psid, image_url) {
                 'ImageUrl': image_url
             };
             request({
-                    url: config.getImagePreprocessUrl(DETECTOR),
+                    //url: config.getImagePreprocessUrl(DETECTOR),
+                    url: IMAGE_PRE_PROCESS_URL,
                     method: "POST",
                     json: request_body
                 },
                 function (error, resp, body) {
-                    if(error)
-                    {
+                    if (error) {
                         console.error(error);
                         console.log(resp);
                     }
@@ -312,8 +360,8 @@ function handleItemSimilarity(sender_psid, image_url) {
         'url': image_url
     };
     request({
-            //url: 'https://shoe-detector-yolo.cfapps.eu10.hana.ondemand.com/Detect',
-            url: 'https://smbmkt.cfapps.eu10.hana.ondemand.com/SimilarItems',
+            //url: 'https://smbmkt.cfapps.eu10.hana.ondemand.com/SimilarItems',
+            url: ITEM_SIMILARITY_END_POINT,
             method: "POST",
             json: request_body
         },
@@ -427,20 +475,6 @@ function handleMessage(sender_psid, received_message) {
         response = {
             "text": i18n.Welcome
         };
-        /* b1BotProxy.login('SBODEMOUS', 'manager', '1234')
-            .then(res => {
-                response = {
-                    "text": i18n.Welcome
-                };
-                callSendAPI(sender_psid, response);
-            })
-            .catch(err => {
-                console.log(err);
-                response = {
-                    "text": i18n.LoginErrorResponse
-                };
-                callSendAPI(sender_psid, response);
-            }); */
     } else if (intent === 'GoodBye' || isBye(text)) {
         response = {
             "text": i18n.GoodByeResponse

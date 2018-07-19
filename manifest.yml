@@ -27,9 +27,13 @@ applications:
   path: ./bot/messenger
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
   instances: 1
-    "PAGE_ACCESS_TOKEN": "!!!Important: Please place your own page access token for the facebook messenger here!!!"
-    "ENABLE_DETECTOR": true
+    "PAGE_ACCESS_TOKEN": "To-Be-Updated: Place the page access token for your own messenger app here"
+    "VERIFY_TOKEN": "To-Be-Updated: Place the verify token for your own messenger app here"
+    "EXIT_ON_MISSING_CONFIG": false
+    "SMBMKT_BACKEND_URL": "To-Be-Updated: place the url for your own smbmkt backend, which can be deployed through ./smbmkt"
+    "ENABLE_DETECTOR": false
     "DETECTOR": "tensorflow"
+    "DETECTOR_URL": "To-Be-Updated: Please place the base url with your own shoe detector, which can be deployed through /smbmkt/detector/tensorflow"
 
 - name: xxx-shoe-detector-tf
   memory: 700MB

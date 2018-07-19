@@ -1,17 +1,57 @@
-exports.smbmkt_root_url = 'https://smbmkt.cfapps.eu10.hana.ondemand.com/';
+exports.smbmkt_root_url =  process.env.SMBMKT_BACKEND_URL || 'https://smbmkt.cfapps.eu10.hana.ondemand.com/';
 exports.smbmkt_similarity_endpoint = 'SimilarItems';
-//production url
+//default smbmkt_bot_root_url, which will be reset on the fly.
 exports.smbmkt_bot_root_url = 'https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com'
-//debug url
-//exports.smbmkt_bot_root_url = 'https://39fcc97f.ngrok.io'
 exports.ViewProductUrl = `${exports.smbmkt_bot_root_url}/web/Products?data=`;
+exports.RefreshBotUrl = true;
 exports.Decimal = 2;
 exports.FbMaxNoInList = 4;
 exports.EnableFbNlp = true;
 exports.NlpConfidenceThreshhold = 0.80;
-exports.AccessToken = 'EAAC1crXKdJcBALxOvdCIjdCnoAkU2F9JVM2NR8WR8mqzS3EcxfW1V70cjBgWuFIYZCQUUuejBpKxUKiZC9ZAS4F0PZBnBZA7q4D0sUH2SA8gS80WxfXutOR1AzxgMvY8XHqQZCNGjhz0qBPjKqnhfcZBpApNPadhqnfXYSdRPklaAZDZD';
-exports.VERIFY_TOKEN = "yatsea-SMBAssistantBot";
+exports.AccessToken = 'To-Be-Updated: Place the page access token for your own messenger app here';
+exports.VERIFY_TOKEN = 'To-Be-Updated: Place the verify token for your own messenger app here';
 exports.Port = 1338;
+
+
+const TO_UPDATE_PLACE_HOLDER = 'To-Be-Updated';
+
+exports.CheckEnvVariable = function(evName) {
+    let ev = process.env[evName];
+
+    if((typeof(ev) === 'undefined') || (ev && ev.includes(TO_UPDATE_PLACE_HOLDER)))
+    {
+        console.error(`Mandatory enviorment variable ${evName} is not configured.`);
+        return false;
+    }
+    return true;
+};
+
+//Mandatory configurations for the SMB Market Place Assistant Bot, which could be configured
+//in manifest.yml or on the fly commands below:
+//On Cloud Foundry:
+//Option 1: Configure the variable in manifest.yml 
+//Option 2: $cf set-env SMBMKT_BACKEND_URL <YOUR_SMBMKT_BACKEND_URL>
+//On-Premise: 
+//Bash: $export SMBMKT_BACKEND_URL <YOUR_SMBMKT_BACKEND_URL>
+//Csh:  $set-env SMBMKT_BACKEND_URL <YOUR_SMBMKT_BACKEND_URL>
+const MandatoryEnvVarList = ["SMBMKT_BACKEND_URL","VERIFY_TOKEN", "PAGE_ACCESS_TOKEN" ];
+
+exports.CheckConfiguration = function() {
+    //if detector is enabeld, will also check IMAGE_PRE_PROCESS_URL
+    if(process.env.ENABLE_DETECTOR 
+    && MandatoryEnvVarList.includes("DETECTOR_URL") === false)
+    {
+        MandatoryEnvVarList.push("DETECTOR_URL");
+    }
+
+    let length = MandatoryEnvVarList.length;
+    let result = true;
+    for(let i = 0; i < length; i++) {
+        result = exports.CheckEnvVariable(MandatoryEnvVarList[i]) && result;
+    }
+    
+    return result;
+}
 
 exports.Detectors = [
     {
@@ -22,7 +62,7 @@ exports.Detectors = [
         "Detector": "tensorflow",
         "ImagePreProcessUrl": "https://shoe-detector-tf.cfapps.eu10.hana.ondemand.com/ImagePreprocess"
     }
-]
+];
 
 exports.ListTemplate = {
     "attachment": {
@@ -98,11 +138,20 @@ exports.getFbUserLocationUrl = function(user_id)
 
 exports.getImagePreprocessUrl = function(detector)
 {
+    let detector_url = process.env.DETECTOR_URL;
+    //Priority#1: Get the Image Preprocess endpoint from the enviroment variable.
+    //if the environemnt varibale DETECTOR_URL has been configuredin manifest.yml or on the fly.
+    if(detector_url && detector_url.includes('To-Be-Updated') === false )
+    {
+        return `${detector_url}/ImagePreprocess`;
+    }
+
+    //Priority#2: Get the Image Preprocess endpoint from the preconfigured exports.Detectors in code.
     for(let i = 0; i < exports.Detectors.length; i++) {
         let entry = exports.Detectors[i];
         if(entry.Detector === detector)
             return entry.ImagePreProcessUrl;
     }
-    //default image preprocessor as tensorflow
+    //Priority#3: default image pre preprocess serivce as tensorflow
     return exports.Detectors[1].ImagePreProcessUrl;
 }
