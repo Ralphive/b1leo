@@ -167,9 +167,9 @@ you either configure the environment variable every time before running.
 ```
 bash: $ export PAGE_ACCESS_TOKEN <YOUR_OWN_PAGE_TOKEN>
 csh:  $ setenv PAGE_ACCESS_TOKEN <YOUR_OWN_PAGE_TOKEN>
-Repeat for the VERIFY_TOKEN
+Repeat for VERIFY_TOKEN and SMBMKT_BACKEND_URL
 ```
-or simply update the PAGE_ACCESS_TOKEN and VERIFY_TOKEN on smbmkt/bot/messenger/config.js
+or simply update the PAGE_ACCESS_TOKEN, VERIFY_TOKEN and SMBMKT_BACKEND_URL on smbmkt/bot/messenger/config.js
 ```js
 exports.smbmkt_root_url = 'To-Be-Updated: place the url for your own smbmkt backend, which can be deployed through ./smbmkt';
 exports.AccessToken = 'To-Be-Updated: Place the page access token for your own messenger app here';
