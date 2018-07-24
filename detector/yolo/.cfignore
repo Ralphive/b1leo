@@ -1,4 +1,4 @@
-node_modules/*
+node_modules
 
 .vscode
 .DS_STORE
@@ -10,3 +10,6 @@ node_modules/*
 yolov3-sample.js
 test.js
 .gitignore
+
+training
+cfg/*.data
