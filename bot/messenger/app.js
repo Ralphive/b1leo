@@ -60,7 +60,7 @@ const PORT = process.env.PORT || config.Port;
 const ENABLE_DETECTOR = process.env.ENABLE_DETECTOR || false;
 const DETECTOR = process.env.DETECTOR || 'tensorflow';
 const IMAGE_PRE_PROCESS_URL = config.getImagePreprocessUrl(DETECTOR);
-const ITEM_SIMILARITY_END_POINT = `${process.env.SMBMKT_BACKEND_URL}/SimilarItems`;
+const ITEM_SIMILARITY_END_POINT = config.getItemSimilarityUrl();
 
 console.log('SMBs Market Place Assistant Bot started');
 app.use('/web', express.static(path.join(__dirname, './views')));
@@ -103,7 +103,8 @@ app.post('/webhook', (req, res) => {
     //build the view product url.
     if(config.RefreshBotUrl)
     {
-        config.smbmkt_bot_root_url = `${req.protocol}://${req.get('host')}`;
+        //req.protocol return http, while messenger api require https:// and host without port;
+        config.smbmkt_bot_root_url = `https://${req.get('host')}`;
         config.ViewProductUrl = `${config.smbmkt_bot_root_url}/web/Products?data=`;
         config.RefreshBotUrl = false;
     }
@@ -479,69 +480,15 @@ function handleMessage(sender_psid, received_message) {
         response = {
             "text": i18n.GoodByeResponse
         };
-        //callSendAPI(sender_psid, response);
     } else if (intent === 'ThankYou' || isThank(text)) {
         response = {
             "text": i18n.ThankYouResponse
         };
-        //callSendAPI(sender_psid, response);
-    }
-    // special intent for the demo, it only for default NLP enabled  
-    else if (intent && intent === 'ShowCustomer') {
-        let customer_code = getNlpFirstEntity(nlp, 'customer_code');
-        console.log('ShowCustomer Intent');
-
-        response = {
-            "text": i18n.ThankYouResponse
-        };
-    } else {
-
+    } 
+    else {
         response = {
             'text': i18n.ErrorResponse
         }
-        //Handover to B1 Chatbot API for process
-        //rendering the result from B1 Chatbot API with message template
-
-        /* b1BotProxy.message(text)
-            .then(res => {
-                let elements = b1BotProxy.proceedDashboardData(res.data);
-                if (elements && elements.length === 0) {
-                    //no data.
-                    response = {
-                        "text": i18n.NoDataResponse
-                    };
-                } else if (elements && elements.length && elements.length === 1) {
-                    //only one element in the result
-                    //Generic template
-                    //It has words number limit around 
-                    let strLen = elements[0].title.length + elements[0].subtitle.length;
-                    if (strLen < 60) {
-                        response = config.GenericTemplate;
-                        response.attachment.payload.elements[0].title = elements[0].title;
-                        response.attachment.payload.elements[0].subtitle = elements[0].subtitle;
-                        response.attachment.payload.elements[0].buttons[0].url = b1BotProxy.buildChartUrl(res.data);
-                    } else {
-                        //too many words, then text only.
-                        response = {
-                            "text": `${elements[0].title}\n${elements[0].subtitle}`
-                        };
-                    }
-                } else {
-                    //List Template for multiple elements
-                    response = config.ListTemplate;
-                    response.attachment.payload.elements = elements;
-                    response.attachment.payload.buttons[0].url = b1BotProxy.buildChartUrl(res.data);
-                }
-                callSendAPI(sender_psid, response);
-            })
-            .catch(err => {
-                console.log(err);
-
-                response = {
-                    "text": i18n.ErrorResponse
-                };
-                callSendAPI(sender_psid, response);
-            }); */
     }
 
     // Send the response message
@@ -549,21 +496,15 @@ function handleMessage(sender_psid, received_message) {
 }
 
 function handlePostback(sender_psid, received_postback) {
-    console.log('ok')
     let response;
     // Get the payload for the postback
     let payload = received_postback.payload;
 
     // Set the response based on the postback payload
-    if (payload === 'yes') {
-        response = {
-            "text": "Thanks!"
-        }
-    } else if (payload === 'no') {
-        response = {
-            "text": "Oops, try sending another image."
-        }
-    }
+    if (payload === 'Get Started') {
+        console.log('Get Started');
+    } 
+    response = intentHelper.GenerateTextResponse(i18n.Welcome);
     // Send the message to acknowledge the postback
     callSendAPI(sender_psid, response);
 }

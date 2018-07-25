@@ -1,4 +1,4 @@
-exports.smbmkt_root_url =  process.env.SMBMKT_BACKEND_URL || 'https://smbmkt.cfapps.eu10.hana.ondemand.com/';
+exports.default_smbmkt_root_url =  'https://smbmkt.cfapps.eu10.hana.ondemand.com';
 exports.smbmkt_similarity_endpoint = 'SimilarItems';
 //default smbmkt_bot_root_url, which will be reset on the fly.
 exports.smbmkt_bot_root_url = 'https://sap-smbassistantbot.cfapps.eu10.hana.ondemand.com'
@@ -128,7 +128,13 @@ exports.getUrl = function (url,encodedData) {
 
 exports.getItemSimilarityUrl = function()
 {
-    return `${exports.smbmkt_root_url}${exports.smbmkt_similarity_endpoint}`;    
+    let smbRootUrl = process.env.SMBMKT_BACKEND_URL;
+    //SMBMKT_BACKEND_URL has been not configured properly
+    if((typeof smbRootUrl === 'undefinded') || (smbRootUrl && smbRootUrl.includes('To-Be-Updated') === true)) {
+        console.log('mandatory environment variable SMBMKT_BACKEND_URL is missing. Point to the default one');
+        smbRootUrl = exports.default_smbmkt_root_url;
+    }
+    return `${smbRootUrl}/${exports.smbmkt_similarity_endpoint}`;
 }
 
 exports.getFbUserLocationUrl = function(user_id)
