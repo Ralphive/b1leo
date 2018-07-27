@@ -42,7 +42,7 @@ $ cf set-env b1leo B1_PASS_ENV 1234
 $ cf set-env b1leo B1_COMP_ENV SBODEMOUS
 ```
 
-It also requires a [SAP Leonardo API Key](https://api.sap.com/shell/discover/contentpackage/SAPLeonardoMLFunctionalServices/api/document_feature_extraction_api) which you can retrive **AFTER** login into the API Hub and clicking on GET API KEY.
+It also requires a [SAP Leonardo API Key](https://api.sap.com/api/sap_service_ticketing_classification_api/overview) which you can retrive **AFTER** login into the API Hub and clicking on GET API KEY.
 ```sh
 $ cf set-env <your app name> LEO_API_KEY <YOUR API KEY>
 ```
