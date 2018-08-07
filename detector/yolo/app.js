@@ -1,14 +1,23 @@
+/********************************************************************************
+A NodeJS RESTful wrapper of turning yolo object detection into web service with 
+Express on SAP Cloud Platform,Clouod Foundry
+
+The source code is under MIT license. Please kindly check the LICENSE.
+Here is to highlight that THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF 
+ANY KIND, EXPRESS ORIMPLIED. Therefore no support available.
+
+Created on: May 20 2018
+Author: Yatsea Li
+
+All rights reserved by SAP SE
+*********************************************************************************/
 'use strict';
 const express = require('express');
 const body_parser = require('body-parser');
 const app = express().use(body_parser.json());
 const path = require('path');
 const DarknetProxy = require('./DarknetProxy');
-const Jimp = require('jimp');
 
-const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/image/';
-const threshold = process.env.DETECT_THRES || 0.80;
-const tempDir = process.env.TEMP_DIR || './temp/';
 const PORT = process.env.PORT || 58999;
 let WEIGHTS = process.env.WEIGHTS || './yolov2_shoe.weights';
 let WEIGHTS_URL = process.env.WEIGHTS_URL || 'https://drive.google.com/file/d/1UDwKu1OSr0XkDLlO3K8Fv4KOLrTeS-ym/edit';
@@ -18,7 +27,7 @@ let NAMES = process.env.NAMES || './cfg/custom.names';
 //global instance of darknet proxy
 let darknetProxy = new DarknetProxy(WEIGHTS, WEIGHTS_URL, CFG, NAMES);
 
-app.use('/image', express.static(path.join(__dirname, './temp')));
+app.use('/Images', express.static(path.join(__dirname, './images')));
 app.use('/web', express.static(path.join(__dirname, './views')));
 app.set('view engine', 'ejs');
 app.listen(PORT, () => console.log(`YOLO image pre-processing service is listening at http://127.0.0.1:${PORT}/`));
@@ -26,9 +35,9 @@ app.listen(PORT, () => console.log(`YOLO image pre-processing service is listeni
 /**
  * Endpoint to initialise the darknet
  */
-app.get('/Initialize', (req, res) => {
-    let dataset = req.query.dataset || 'shoe';
-    let algorithm = req.query.algorithm || 'yolo-v2';
+app.post('/Initialize', (req, res) => {
+    let dataset = req.body.dataset || 'shoe';
+    let algorithm = req.body.algorithm || 'yolo-v2';
     console.log(`dataset: ${dataset}, algorithm: ${algorithm}`);
 
     let setting = darknetProxy.getSetting(dataset, algorithm);
@@ -58,7 +67,7 @@ app.get('/Weights', (req, res) => {
  * Web Detector demo kit
  */
 app.get('/web/Detector', (req, res) => {
-    res.render(path.join(__dirname, './views/Detector'), {});
+    res.render('Detector', {});
 });
 
 /**
@@ -100,47 +109,16 @@ app.post('/Detect', (req, res) => {
 app.post('/ImagePreprocess', (req, res) => {
     if (req.body && req.body.ImageUrl) {
         darknetProxy.ImagePreprocess(req.body.ImageUrl, req.body.Threshold)
-        .then(result => {
-            res.status(200).json(result);
-        })
-        .catch(error => {
-            res.status(500).json(error);
-        });
-        
-        // darknetProxy.Detect(req.body.ImageUrl, req.body.Threshold)
-        //     .then(result => {
-        //         console.log(result);
-        //         if(result.length === 0)
-        //         {
-        //             //no shoe detect
-        //             let imageRes = {};
-        //             imageRes.CroppedImageUrl = '';
-        //             imageRes.Message = 'No shoe detected';
-        //             imageRes.ReturnCode = -99;
-        //             res.status(200).json(imageRes);
-        //             return;
-        //         }
-                
-        //         //let cropImageName = util.GenerateImageFileName();
-        //         let cropImageName = result[0].imagePath;
-        //         Jimp.read(req.body.ImageUrl)
-        //             .then(function (image) {
-        //                 image.crop(result[0].box.x, result[0].box.y, result[0].box.w, result[0].box.h)
-        //                 .write(cropImageName);
-        //                 let imageRes = {};
-        //                 imageRes.CroppedImageUrl = IMAGE_BASE_URL + cropImageName.split("/")[1];
-        //                 imageRes.Confidence = result[0].prob;
-        //                 imageRes.Object = result[0].name;
-        //                 imageRes.ReturnCode = 0;
-        //                 res.status(200).json(imageRes);
-        //             });
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //         res.status(500).json({
-        //             error: error
-        //         });
-        //     });
+            .then(result => {
+                if (req.body.Id) {
+                    result.Id = req.body.Id;
+                    result.OrginalURL = req.body.ImageUrl;
+                }
+                res.status(200).json(result);
+            })
+            .catch(error => {
+                res.status(500).json(error);
+            });
     } else {
         res.status(500).json({
             error: "Missing ImageUrl in request body."
@@ -148,6 +126,6 @@ app.post('/ImagePreprocess', (req, res) => {
     }
 });
 
-app.get('/image/:fileName', function (req, res) {
-    res.sendFile('temp/'+req.params.fileName);
+app.get('/Images/:fileName', function (req, res) {
+    res.sendFile(req.params.fileName);
 });

@@ -1,3 +1,17 @@
+/********************************************************************************
+A generic object-oriented proxy class for Darknet, which implement the Detect for 
+the object detection and ImagePreproess function for cropping the bounding box of 
+the detected with highest detection score into a new image.
+
+The source code is under MIT license. Please kindly check the LICENSE.
+Here is to highlight that THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF 
+ANY KIND, EXPRESS ORIMPLIED. Therefore no support available.
+
+Created on: May 20 2018
+Author: Yatsea Li
+
+All rights reserved by SAP SE
+*********************************************************************************/
 'use strict';
 const fs = require('fs');
 const shell = require('shelljs');
@@ -8,7 +22,7 @@ const Jimp = require('jimp');
 const sizeOf = require('image-size');
 
 const threshold = process.env.DETECT_THRES || 0.70;
-const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/image/';
+const IMAGE_BASE_URL =  process.env.IMAGE_BASE_URL || 'http://127.0.0.1:58999/Images/';
 
 module.exports = class DarknetProxy {
 
@@ -103,13 +117,15 @@ module.exports = class DarknetProxy {
      * Test function.
      */
     Test() {
-        let result = this.darknet.detect('./temp/shoe.jpg');
+        let result = this.darknet.detect('./images/shoe.jpg');
         console.log(result);
         return result;
     }
 
     /**
      * Detect the object with give imageUrl and threshold of confidence.
+     * The output of object bounding box has been formated as 
+     * (x-top left, y-top right, w-width, h-height) in pixel
      * @param {*} imageUrl 
      * @param {*} thres 
      */

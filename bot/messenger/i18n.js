@@ -1,11 +1,11 @@
-exports.Welcome = 'Hello, Welcome to SAP SMB Market Place. I am Milton, your virtual assistant. What can I help?';
+exports.Welcome = 'Hello, Welcome to SAP SMB Market Place. I am Milton, your virtual assistant. What can I help? If you need help on manual, just type help.';
 exports.GoodByeResponse = 'Good bye. Have a nice day.';
 exports.GoodByeResponse2 = 'It is nice to talk with you. Good bye.';
 exports.ThankYouResponse = 'My pleasure, Master.';
 exports.ThankYouResponse2 = 'You are welcome, Master.';
 exports.NoDataResponse = 'No data';
 exports.LoginErrorResponse = `Hello, I am Milton, your virtual assistant. Sorry but I can't login at this time.`;
-exports.ErrorResponse = 'Sorry, but it is beyond of me. Please check your question.';
+exports.ErrorResponse = 'Sorry, but it is beyond of me. Please check your question. If you need help, just type help.';
 exports.BotNameIntentReply1 = 'My name is Milton, your virtual assistant. I can help you to find the similar products in the SAP SMB Market Place(B1&ByD) with a picture, and keep learning and elvolving to serve you better.';
 exports.BotNameIntentReply2 = 'I am Milton, your virtual assistant. At the present moment, I can help you to find out the similar products in the SAP SMB Market Place(B1&ByD) with a picture. I am powered by SAP Leonardo Machine Learning Foundation, still keep learning and evolving.';
 exports.BotGenderIntentReply1 = 'Milton sounds like a boy. So I should be a guy.';

@@ -1,0 +1,10 @@
+ssd_mobilenet_v1_coco_2017_11_17.tar.gz
+
+ssd_mobilenet_v1_coco_2017_11_17
+
+models
+*.pyc
+object_detection/utils/*.pyc
+object_detection/protos/*.pyc
+object_detection/*pyc
+object_detection/training

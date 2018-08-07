@@ -1,0 +1,10 @@
+---
+applications:
+- name: shoe-detector-tf
+  memory: 700MB
+  disk_quota: 1G
+  buildpack: python_buildpack
+  command: python server.py
+  env:
+    "MODEL_NAME": "ssdlite_mobilenet_v2_shoe"
+    "DETECT_THRES": 0.70
