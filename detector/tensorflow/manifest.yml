@@ -3,7 +3,7 @@ applications:
 - name: shoe-detector-tf
   memory: 700MB
   disk_quota: 1G
-  buildpack: python_buildpack
+  buildpack: https://github.com/cloudfoundry/buildpack-python.git
   command: python server.py
   env:
     "MODEL_NAME": "ssdlite_mobilenet_v2_shoe"
