@@ -1,7 +1,7 @@
 /* Set rates + misc */
 $(document).ready(function () {
-    var taxRate = 0.05;
-    var shippingRate = 15.00;
+    var taxRate = 0.0;
+    var shippingRate = 0.0;
     var fadeTime = 300;
     localStorage.products = localStorage.products ? localStorage.products : '[]';
     let products = JSON.parse(localStorage.products);
@@ -23,7 +23,7 @@ $(document).ready(function () {
     </div>
     <div class="product-removal">
         <button class="remove-product" data-id="${element.id}">
-            Remove
+        X
         </button>
     </div>
     <div class="product-line-price">${lineTotal.toFixed(2)}</div>
