@@ -43,7 +43,7 @@ $(function () {
     },
     getDiscountPrice: function (products, totalPrice, totalQuantity) {
     console.log("calculating discount", products, totalPrice, totalQuantity);
-    return totalPrice * 0.95;
+    return totalPrice;
     }
   });
   
@@ -54,7 +54,7 @@ $(function () {
     <h2>${product.productid}<small>(Similarity: ${product.score})</small></h2>
     <h2>${product.name}</h2>
     <h2>Price: ${product.price}${product.priceCurrency} In stock: ${product.inventoryLevel}</h2>
-    <button class="btn btn-default btn-danger my-cart-btn btn-lg" data-id="${product.productid}" data-name="${product.name}"
+    <button class="btn btn-default btn-danger btn-lg my-cart-btn" data-id="${product.productid}" data-name="${product.name}"
     data-source="${product.source}" data-price="${product.price}" data-quantity="1" data-image="${product.image}">Add to Cart</button>
     <button type="button" class="btn btn-info btn-lg bmd-modalButton" data-toggle="modal" data-bmdSrc="Store" data-bmdWidth="640" data-bmdHeight="450" data-target="#myModal">Check Store</button>
   </div>`;
@@ -113,8 +113,8 @@ $(function () {
     var self = this;
     var settings = $.extend({
       classBtn: '.bmd-modalButton',
-      defaultW: 640,
-      defaultH: 360
+      defaultW: 800,
+      defaultH: 600
     }, options );
   
     $(settings.classBtn).on('click', function(e) {

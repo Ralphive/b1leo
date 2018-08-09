@@ -1,3 +1,13 @@
+/**mycart size**/
+.mycart {
+    width: 95%;
+    margin: auto;
+}
+
+#my-cart-table {
+    font-size: 25px;    
+}
+
 .glyphicon {
     font-size: 60px;
 }
@@ -5,8 +15,8 @@
 .badge-notify {
     background: red;
     position: relative;
-    top: -20px;
-    right: 10px;
+    top: -13px;
+    right: 40px;
     font-size: 20px;
 }
 
@@ -34,6 +44,7 @@
     box-shadow: none;
     background-color: transparent;
     border: 0;
+    width: 90%;
 }
 
 .bmd-modalContent .close {
