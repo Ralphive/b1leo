@@ -17,13 +17,18 @@ var fs = require('fs')
 var LeoServer = process.env.LEO_SERVER || "https://sandbox.api.sap.com/ml"
 
 function extractVectors(file, callback) { 
-    // More info on
-    // https://help.sap.com/viewer/product/SAP_LEONARDO_MACHINE_LEARNING_FOUNDATION/1.0/en-US
+    /** Official Documentation
+     * https://help.sap.com/viewer/b04a8fe9c04745b98ad8652ccd5d636f/1.0/en-US/d6fee2fd184d48d5b221928a8db4c2fd.html
+     *
+     *  API Reference: https://api.sap.com/api/img_feature_extraction_api/overview
+     * 
+    **/
 
     console.log("LEO RECEIVED: "+file);
 
+    var enpoint = process.env.LEO_FEATUREX_ENDPOINT || '/imagefeatureextraction/feature-extraction'
     var options = {
-        url: 'https://sandbox.api.sap.com/ml/featureextraction/inference_sync',
+        url: LeoServer+enpoint,
         headers: {
             'APIKey': process.env.LEO_API_KEY,
             'Accept': 'application/json'
@@ -57,9 +62,18 @@ function extractVectors(file, callback) {
 
 function SimilatiryScoring(vectorsZip, numSimilars, callback) {
 
+    /** Official Documentation
+     * https://help.sap.com/viewer/c6b1f1188a684b3b97f0a5e3c82f5f1e/1.0/en-US/0399fdf795a64c3b807258b4054bf279.html
+     *
+     *  API Reference: https://api.sap.com/api/similarity_scoring_api/overview
+     * 
+    **/
+
     numSimilars = numSimilars || 4
+    var enpoint = process.env.LEO_SIMILARITY_ENDPOINT || '/new/similarityscoring/similarity-scoring'
+    
     var options = {
-        url: 'https://sandbox.api.sap.com/ml/similarityscoring/inference_sync',
+        url: LeoServer+enpoint,
         headers: {
             'APIKey': process.env.LEO_API_KEY,
             'Accept': 'application/json',

@@ -110,7 +110,7 @@ function RetrieveImages(callback) {
                             for (vector in vectors.predictions) {
                                 console.log("Received Vector for vector #" + vector + " - " + vectors.predictions[vector].name)
                                 var rowToUpdate = biz.FileToRow(vectors.predictions[vector].name)
-                                rowToUpdate.imgvector = vectors.predictions[vector].feature_vector
+                                rowToUpdate.imgvector = vectors.predictions[vector].featureVectors
                                 sql.UpdateVector(rowToUpdate, function (err, result) {
                                     console.log("Table Updated")
                                 })

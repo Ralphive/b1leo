@@ -288,7 +288,7 @@ function CreateSimilarityZip(library, similar, callback) {
 
 
     //Add vector to be compared (Similar) to the Zip
-    var buff = Buffer.from(JSON.stringify(similar.predictions[0].feature_vector), "utf8");
+    var buff = Buffer.from(JSON.stringify(similar.predictions[0].featureVectors), "utf8");
     var fileName = similar.predictions[0].name
     fileName += '.txt'
     archive.append(buff, { name: fileName });
