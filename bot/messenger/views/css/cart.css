@@ -1,5 +1,9 @@
 /* Global settings */
 /* Global "table" column settings */
+.shopping-cart {
+  font-size: 25px;
+}
+
 .product-image {
     float: left;
     width: 20%;
@@ -114,7 +118,7 @@
     background-color: #c66;
     color: #fff;
     font-family: "HelveticaNeue-Medium", "Helvetica Neue Medium";
-    font-size: 12px;
+    font-size: 25px;
     border-radius: 3px;
   }
   .product .remove-product:hover {
