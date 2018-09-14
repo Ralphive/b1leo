@@ -16,6 +16,7 @@ applications:
     "TEMP_DIR": "files/tmp"
     "VECTOR_DIR": "files/vectors"
     "FILE_SEP": "-_-_"
-    
+
   services:
     - cachedb
+    - itemsdb
