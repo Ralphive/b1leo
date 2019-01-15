@@ -70,7 +70,7 @@ function SimilatiryScoring(vectorsZip, numSimilars, callback) {
     **/
 
     numSimilars = numSimilars || 4
-    var enpoint = process.env.LEO_SIMILARITY_ENDPOINT || 'similarityscoring/similarity-scoring'
+    var enpoint = process.env.LEO_SIMILARITY_ENDPOINT || '/similarityscoring/similarity-scoring'
     
     var options = {
         url: LeoServer+enpoint,
