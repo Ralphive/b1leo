@@ -8,3 +8,5 @@ object_detection/utils/*.pyc
 object_detection/protos/*.pyc
 object_detection/*pyc
 object_detection/training
+
+*.record
