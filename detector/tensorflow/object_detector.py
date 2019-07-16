@@ -66,13 +66,8 @@ import uuid
 import googledrive_donwload_helper
 from PIL import Image
 
-<<<<<<< HEAD
-if tf.__version__ < '1.4.0':
-    raise ImportError('Please upgrade your tensorflow installation to v1.4.0 or higher!')
-=======
 # if tf.__version__ < '1.4.0':
 #     raise ImportError('Please upgrade your tensorflow installation to v1.4.0 or higher!')
->>>>>>> a51d156d2cee2ac9309f97db28b9cc9dcf9cf709
 
 # ENV SETUP  ### CWH: remove matplot display and manually add paths to references
 
