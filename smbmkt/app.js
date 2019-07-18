@@ -22,37 +22,37 @@ console.log("Configuring redis")
 //From CF BackingServiecs, OR a Remote Host OR a local (credentials = null)
 if (process.env.VCAP_SERVICES) {
     vcap = JSON.parse(process.env.VCAP_SERVICES);
-  
+
     if (vcap.hasOwnProperty('redis')) {
-      credentials = vcap.redis[0].credentials;
-      credentials.host = credentials.hostname
-      console.log("Redis credentials found in VCAP")
+        credentials = vcap.redis[0].credentials;
+        credentials.host = credentials.hostname
+        console.log("Redis credentials found in VCAP")
     } else {
-      console.log("No Redis found in VCAP Services")
+        console.log("No Redis found in VCAP Services")
     }
-  };
-  
-  if (!credentials) {
+};
+
+if (!credentials) {
     //Maybe Redis is on a remote enviroment
     console.log("Looking for remote Redis connection details")
     if (process.env.REDIS_HOST) {
-      console.log("trying to connect to Redis on " + process.env.REDIS_HOST)
-      credentials = {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        password: process.env.REDIS_PASSWORD,
-  
-      }
+        console.log("trying to connect to Redis on " + process.env.REDIS_HOST)
+        credentials = {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT,
+            password: process.env.REDIS_PASSWORD,
+
+        }
     } else {
-      console.log("No remote Redis details found, will try to connect locally")
+        console.log("No remote Redis details found, will try to connect locally")
     }
-  }
-  
-  var redisClient = redis.createClient(credentials);
-  redisClient.on('error', function (er) {
+}
+
+var redisClient = redis.createClient(credentials);
+redisClient.on('error', function (er) {
     console.trace('Here I am');
     console.error(er.stack);
-  });
+});
 
 redisClient.on('connect', function () {
     console.log("Connected to Redis")
@@ -67,20 +67,22 @@ credentials = null;
 console.log("Connecting to PostgresSQL...")
 if (process.env.VCAP_SERVICES) {
     vcap = JSON.parse(process.env.VCAP_SERVICES);
-    
-    if(vcap.hasOwnProperty('postgresql')){
+
+    if (vcap.hasOwnProperty('postgresql')) {
         //Postgresql on CloudFoundry services
-        credentials = { connectionString: vcap.postgresql[0].credentials.uri }
+        credentials = {
+            connectionString: vcap.postgresql[0].credentials.uri
+        }
         console.log("PostgresSQL found in VCAP Services")
-    }else{
+    } else {
         console.log("No PostgresSQL found in VCAP Services")
     }
 }
 
-if(!credentials){
+if (!credentials) {
     //Maybe PostgreSQL on a remote enviroment
     console.log("Looking for remote PostgresSQL connection details")
-    if(process.env.PG_HOST){
+    if (process.env.PG_HOST) {
         console.log("trying to connect to PostgreSQL on " + process.env.PG_HOST)
         credentials = {
             user: process.env.PG_USER,
@@ -90,7 +92,7 @@ if(!credentials){
             password: process.env.PG_PASSWORD,
             ssl: true
         }
-    }else{
+    } else {
         console.log("No remote PostreSQL details found, will try to connect locally")
     }
 }
@@ -118,14 +120,16 @@ app.use(function (req, res, next) {
 });
 
 //To Support body on post requests
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.json());
 
 //Static folder (to css and js front end files)
 app.use(express.static('public'));
 
 
-setInterval(biz.UpdateItemPrices,1.8e+6)
+setInterval(biz.UpdateItemPrices, 1.8e+6)
 
 /* Express API */
 // Root path to retrieve Index.html
@@ -199,4 +203,3 @@ var port = process.env.PORT || 30000
 app.listen(port, function () {
     console.log('Example app listening on port ' + port);
 });
-
