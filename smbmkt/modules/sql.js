@@ -35,10 +35,10 @@ function Initialize(callback) {
     console.log('Initializing PostgreSQL database')
 
     var query = 'CREATE TABLE IF NOT EXISTS '
-        + 'items (productid varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector text,'
+        + 'smbmkt_items (productid varchar(256) NOT NULL, origin varchar(10) NOT NULL, image varchar(500), imgvector text,'
         + 'PRIMARY KEY (productid, origin)); '
         + 'CREATE TABLE IF NOT EXISTS '
-        + 'itemsPrice (productid varchar(256) NOT NULL, origin varchar(10) NOT NULL, price decimal, currency varchar(10),'
+        + 'smbmkt_itemsprice (productid varchar(256) NOT NULL, origin varchar(10) NOT NULL, price decimal, currency varchar(10),'
         + 'PRIMARY KEY (productid, origin)); '
 
 
@@ -56,7 +56,7 @@ function Initialize(callback) {
 }
 
 function Select(callback) {
-    var query = 'SELECT * FROM items'
+    var query = 'SELECT * FROM smbmkt_items'
     pgClient.query(query, function (err, result) {
         if (err) {
             callback(err)
@@ -67,7 +67,7 @@ function Select(callback) {
 }
 
 function SelectErpItems(origin, callback) {
-    var query = 'SELECT * FROM items where origin = $1'
+    var query = 'SELECT * FROM smbmkt_items where origin = $1'
     pgClient.query(query, [origin], function (err, result) {
         if (err) {
             callback(err)
@@ -78,7 +78,7 @@ function SelectErpItems(origin, callback) {
 }
 
 function SelectErpItemsPrices(origin, callback) {
-    var query = 'SELECT * FROM itemsprice where origin = $1'
+    var query = 'SELECT * FROM smbmkt_itemsprice where origin = $1'
     pgClient.query(query, [origin], function (err, result) {
         if (err) {
             callback(err)
@@ -89,7 +89,7 @@ function SelectErpItemsPrices(origin, callback) {
 }
 
 function SelectImages(callback) {
-    var query = 'SELECT * FROM items where imgvector IS NOT null'
+    var query = 'SELECT * FROM smbmkt_items where imgvector IS NOT null'
     pgClient.query(query, function (err, result) {
         if (err) {
             callback(err)
@@ -106,7 +106,7 @@ function Insert(data, callback) {
 
     console.log('PG Inserting Table data for ' + data.origin + ' item ' + data.productid)
 
-    var query = 'INSERT INTO items(productid,origin,image,imgvector) '
+    var query = 'INSERT INTO smbmkt_items(productid,origin,image,imgvector) '
         + 'VALUES($1, $2, $3, $4) '
         + 'ON CONFLICT (productid,origin) DO UPDATE '
         + 'SET image = $3'
@@ -125,7 +125,7 @@ function InsertPrice(data, callback) {
     
     console.log('PG Inserting Price data for ' + data.origin + ' item ' + data.productid)
 
-    var query = 'INSERT INTO itemsprice(productid,origin,price,currency) '
+    var query = 'INSERT INTO smbmkt_itemsprice(productid,origin,price,currency) '
         + 'VALUES($1, $2, $3, $4) '
         + 'ON CONFLICT (productid,origin) DO UPDATE '
         + 'SET price = $3, currency = $4'
@@ -146,7 +146,7 @@ function UpdateVector(data, callback) {
     var pgvector = data.imgvector;
     pgvector ="["+pgvector.toString()+"]" 
 
-    var query = 'UPDATE items SET imgvector = $3 WHERE productid = $1 and origin = $2';
+    var query = 'UPDATE smbmkt_items SET imgvector = $3 WHERE productid = $1 and origin = $2';
     
     pgClient.query(query, [data.productid, data.origin, pgvector], function (err, result) {
         if (err) {
